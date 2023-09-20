@@ -1,5 +1,6 @@
 'use client';
 import CmsAPI from '@/api/cms';
+import ImageUpload from '@/components/cms/Upload';
 import { TeamObjectP } from '@/utils/interface';
 import { Table, Button, Modal, Form, Input, Select } from 'antd';
 import Image from 'next/image';
@@ -11,6 +12,7 @@ export default function Teams() {
   const [datas, setDatas] = useState<TeamObjectP[]>();
   const [datasGames, setDatasGames] =
     useState<{ label: string; value: number }[]>();
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleOk = () => {
     form.validateFields().then(() => {
@@ -33,8 +35,8 @@ export default function Teams() {
     },
     {
       title: 'Icon',
-      dataIndex: 'icon',
-      key: 'icon',
+      dataIndex: 'game_icons',
+      key: 'game_icons',
       render: (icon: string) => (
         <Image loader={() => icon} src={icon} alt="d" width={30} height={30} />
       ),
@@ -57,12 +59,12 @@ export default function Teams() {
 
   const getAllTeams = async () => {
     try {
+      setLoading(true);
       const { data } = await CmsAPI.getTeams();
       const { data: dataGames } = await CmsAPI.getGames();
       const newMap = data.map((d) => ({
         ...d,
         key: d.id,
-        icon: 'https://res.cloudinary.com/dpcwbnax4/image/upload/v1694712259/MERCH%20%2B%20BG/Artboard_1_wtscgn.png',
       }));
       const gamesNewMap = dataGames.map((d) => ({
         label: d.game_names,
@@ -72,6 +74,8 @@ export default function Teams() {
       setDatas(newMap);
     } catch (error) {
       console.log(error, 'error');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -103,6 +107,12 @@ export default function Teams() {
             name={'game_id'}>
             <Select style={{ width: '100%' }} options={datasGames} />
           </Form.Item>
+          <Form.Item
+            name="game_icons"
+            label="Game Icons"
+            rules={[{ required: true, message: 'game icon is required' }]}>
+            <ImageUpload />
+          </Form.Item>
         </Form>
       </Modal>
       <div className="flex justify-between mb-[50px]">
@@ -119,7 +129,7 @@ export default function Teams() {
         </div>
       </div>
       <div>
-        <Table dataSource={datas} columns={columns} />
+        <Table loading={loading} dataSource={datas} columns={columns} />
       </div>
     </div>
   );
