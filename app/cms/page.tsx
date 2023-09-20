@@ -1,39 +1,39 @@
 'use client';
+import CmsAPI from '@/api/cms';
 import { AxiosError } from 'axios';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function CMS() {
-  const [loading, setLoading] = useState(false);
-  console.log(loading);
+  const router = useRouter();
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
 
     let payload: { email: string; password: string };
 
     if (e.target instanceof HTMLFormElement) {
       const targetEmail = e.target.elements.namedItem('email');
       const targetPassword = e.target.elements.namedItem('password');
-      payload.email = (targetEmail as HTMLInputElement)?.value || '';
-      payload.password = (targetPassword as HTMLInputElement)?.value || '';
+      const emailPay = (targetEmail as HTMLInputElement).value;
+      const passwordPay = (targetPassword as HTMLInputElement).value;
+      payload = { email: emailPay, password: passwordPay };
     }
 
     try {
-      // await WebsiteAPI.createTicket(payload);
-      toast.success(
-        'Terima kasih sudah melakukan registrasi, periksa email kamu untuk informasi lebih lanjut!',
-        {
-          position: 'top-center',
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: 'light',
-        }
-      );
+      const { data } = await CmsAPI.login(payload);
+      localStorage.setItem('cms_user', JSON.stringify(data));
+      router.push('/cms/home/ongoing');
+      toast.success('Successfully Logged In!', {
+        position: 'top-center',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      });
     } catch (error) {
       if (error) {
         const axiosError = error as AxiosError; // Cast error to AxiosError
@@ -54,11 +54,8 @@ export default function CMS() {
           theme: 'light',
         });
       } else {
-        // Handle non-Axios errors here
         console.error(error, 'err');
       }
-    } finally {
-      setLoading(false);
     }
   };
 
