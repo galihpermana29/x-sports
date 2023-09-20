@@ -1,5 +1,9 @@
-import './globals.scss';
+import Navbar from '@/components/shared/Navbar';
 import type { Metadata } from 'next';
+import { Montserrat } from 'next/font/google';
+import './globals.scss';
+
+const mainFont = Montserrat({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -13,7 +17,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className={mainFont.className}>
+        <Navbar />
+        {children}
+      </body>
     </html>
   );
 }
