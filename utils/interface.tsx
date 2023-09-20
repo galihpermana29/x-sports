@@ -18,7 +18,7 @@ export type TeamObjectP = {
   team_names: string;
   game_id: number;
   game_names: string;
-  icon?: string;
+  game_icons?: string;
   key?: number;
 };
 
