@@ -1,24 +1,26 @@
 'use client';
 import CmsAPI from '@/api/cms';
 import ImageUpload from '@/components/cms/Upload';
-import { GamesObjectP, TeamObjectP } from '@/utils/interface';
-import { Table, Button, Modal, Form, Input, message } from 'antd';
+import { TeamObjectP } from '@/utils/interface';
+import { Table, Button, Modal, Form, Input, Select, message } from 'antd';
 import { AxiosError } from 'axios';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
-export default function Games() {
+export default function Completed() {
   const [form] = Form.useForm();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [datas, setDatas] = useState<GamesObjectP[]>();
+  const [datas, setDatas] = useState<TeamObjectP[]>();
+  const [datasGames, setDatasGames] =
+    useState<{ label: string; value: number }[]>();
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleOk = () => {
     form.validateFields().then(async () => {
       const value = form.getFieldsValue();
       try {
-        await CmsAPI.createGames(value);
-        getAllGames();
+        await CmsAPI.createTeams(value);
+        getAllTeams();
         setIsModalOpen(false);
       } catch (error) {
         const axiosError = error as AxiosError; // Cast error to AxiosError
@@ -35,6 +37,11 @@ export default function Games() {
   };
 
   const columns = [
+    {
+      title: 'Team Name',
+      dataIndex: 'team_names',
+      key: 'team_names',
+    },
     {
       title: 'Game',
       dataIndex: 'game_names',
@@ -64,15 +71,20 @@ export default function Games() {
     },
   ];
 
-  const getAllGames = async () => {
+  const getAllTeams = async () => {
     try {
       setLoading(true);
-      const { data } = await CmsAPI.getGames();
+      const { data: dataGames } = await CmsAPI.getGames();
+      const { data } = await CmsAPI.getTeams();
       const newMap = data.map((d) => ({
         ...d,
         key: d.id,
       }));
-
+      const gamesNewMap = dataGames.map((d) => ({
+        label: d.game_names,
+        value: d.id,
+      }));
+      setDatasGames(gamesNewMap);
       setDatas(newMap);
     } catch (error) {
       console.log(error, 'error');
@@ -82,7 +94,7 @@ export default function Games() {
   };
 
   useEffect(() => {
-    getAllGames();
+    getAllTeams();
   }, []);
   return (
     <div className="p-[50px]">
@@ -98,17 +110,22 @@ export default function Games() {
         <Form layout="vertical" className="my-[20px]" form={form}>
           <Form.Item
             rules={[{ required: true, message: 'team name is required' }]}
-            label="Game Name"
-            name={'game_names'}
+            label="Team Name"
+            name={'team_names'}
             className="mb-[10px]">
-            <Input placeholder="Game Name" />
+            <Input placeholder="Team Name" />
           </Form.Item>
-
           <Form.Item
-            name="game_icons"
+            rules={[{ required: true, message: 'game name is required' }]}
+            label="Game"
+            name={'game_id'}>
+            <Select style={{ width: '100%' }} options={datasGames} />
+          </Form.Item>
+          <Form.Item
+            name="team_icons"
             label="Game Icons"
             rules={[{ required: true, message: 'game icon is required' }]}>
-            <ImageUpload form={form} name="game_icons" />
+            <ImageUpload form={form} name={'team_icons'} />
           </Form.Item>
         </Form>
       </Modal>
