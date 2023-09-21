@@ -46,6 +46,9 @@ const config: Config = {
           },
         },
       },
+      screens: {
+        xs: '400px',
+      },
     },
   },
   plugins: [],

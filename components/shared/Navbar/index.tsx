@@ -28,7 +28,7 @@ function Navbar() {
   }, []);
 
   return (
-    <nav className="py-5 px-10 sticky top-0 z-30 bg-xport-black-light">
+    <nav className="py-5 px-5 md:px-10 sticky top-0 z-30 bg-xport-black-light">
       <div className="flex justify-between items-center max-w-screen-xl mx-auto">
         <Link href={'/'}>
           <LogoWithText className="h-16" />
