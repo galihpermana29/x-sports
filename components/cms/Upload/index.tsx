@@ -1,56 +1,86 @@
-import React, { useState } from 'react';
-import { Upload, Button } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Upload, Button, FormInstance } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import Image from 'next/image';
+import axios from 'axios';
+import { getBearerToken } from '@/api/token';
+import { API_URL } from '@/api';
 
-// Define the API endpoint to upload images
-const uploadApiUrl = 'https://api.x-sports.site/api/v1/upload';
+interface ImageUploadI {
+  form: FormInstance<any>;
+  name: string;
+}
 
-const ImageUpload: React.FC = () => {
+const ImageUpload = ({ form, name }: ImageUploadI) => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  // Function to handle image upload
   const handleImageUpload = async (options: any) => {
     const { file, onSuccess, onError } = options;
     const formData = new FormData();
     formData.append('file', file);
 
     try {
-      // Send a POST request to the API to upload the image
-      const response = await fetch(uploadApiUrl, {
-        method: 'POST',
-        body: formData,
-      });
+      setLoading(true);
+      const formData = new FormData();
+      formData.append('file', file);
 
-      if (response.ok) {
-        const data = await response.json();
-        const { imageUrl } = data;
+      const { data } = await axios.post<{ data: string }>(
+        API_URL + '/upload',
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${getBearerToken()}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
 
-        setImageUrl(imageUrl); // Set the uploaded image URL
+      if (data) {
+        setImageUrl(data.data);
+        form.setFieldsValue({ [name]: data.data });
         onSuccess();
       } else {
         onError('Upload failed');
       }
     } catch (error) {
+      console.log(error, 'error');
       onError('Upload failed');
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Function to handle file removal
   const handleRemove = () => {
     setImageUrl(null);
   };
 
+  useEffect(() => {
+    const initial = form.getFieldValue(name) ?? null;
+    setImageUrl(initial);
+  }, []);
+
   return (
-    <div>
+    <div className="flex flex-col items-start">
       <Upload
         customRequest={handleImageUpload}
         showUploadList={false}
         accept="image/*">
         {imageUrl ? (
-          <Image src={imageUrl} alt="Uploaded" style={{ maxWidth: '100px' }} />
+          <div className="h-[200px] w-full max-w-[300px]">
+            <Image
+              loader={() => imageUrl}
+              src={imageUrl}
+              alt="Uploaded"
+              width={300}
+              height={300}
+              className="w-full h-full object-cover"
+            />
+          </div>
         ) : (
-          <Button icon={<UploadOutlined />}>Upload Image</Button>
+          <Button loading={loading} icon={<UploadOutlined />}>
+            Upload Image
+          </Button>
         )}
       </Upload>
       {imageUrl && (
