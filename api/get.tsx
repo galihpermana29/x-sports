@@ -1,4 +1,9 @@
-import { AllMatchData, GamesData, MatchDetailData } from '@/utils/types';
+import {
+  AllMatchData,
+  GamesData,
+  MatchDetailData,
+  NewsData,
+} from '@/utils/types';
 import { clientApi } from '.';
 
 async function getAllGames(): Promise<GamesData> {
@@ -15,10 +20,16 @@ async function getMatchById(id: number): Promise<MatchDetailData> {
   return data;
 }
 
+async function getAllNews(): Promise<NewsData> {
+  const { data } = await clientApi.get<NewsData>(`/news`);
+  return data;
+}
+
 const GET = {
   getAllGames,
   getMatchById,
   getAllMatch,
+  getAllNews,
 };
 
 export default GET;

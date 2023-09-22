@@ -1,7 +1,7 @@
 export type Game = {
   id: number;
   game_names: string;
-  game_icons: string;
+  game_icons: string | null;
 };
 
 export type GamesData = {
@@ -13,6 +13,7 @@ export type MatchDetail = {
   tournament_names: string;
   game_id: number;
   game_names: string;
+  game_icons: string;
   team_a_id: number;
   team_a_names: string;
   team_a_odds: number;
@@ -33,4 +34,19 @@ export type MatchDetailData = {
 
 export type AllMatchData = {
   data: MatchDetail[];
+};
+
+export type News = {
+  id: number;
+  title: string;
+  game_id: number;
+  game_names: string;
+  game_icons: string;
+  description: string;
+  image_news: string;
+  date: string;
+};
+
+export type NewsData = {
+  data: News[];
 };

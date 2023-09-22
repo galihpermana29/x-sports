@@ -3,6 +3,7 @@
 import GET from '@/api/get';
 import ArrowRightIcon from '@/components/icons/ArrowRightIcon';
 import BetSlipTab from '@/components/shared/BetSlipTab';
+import { parseVideoId } from '@/utils/functions';
 import { MatchDetail, type MatchDetailData } from '@/utils/types';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -18,28 +19,32 @@ function Livestream() {
   const path = usePathname();
   const matchId = parseInt(path.split('/').pop());
 
+  const getMatchDetail = async () => {
+    const res = await GET.getMatchById(matchId);
+    setMatch(res);
+  };
+  const getAllMatch = async () => {
+    const res = await GET.getAllMatch();
+    console.log(res);
+    const ongoing = res.data.filter((data, index) => {
+      return (
+        data.id !== match?.data.id &&
+        data.status === 'upcoming' &&
+        data.game_names === match?.data.game_names &&
+        index < 3
+      );
+    });
+
+    setFilteredMatches(ongoing);
+  };
+
   useEffect(() => {
-    const getMatchDetail = async () => {
-      const res = await GET.getMatchById(matchId);
-      setMatch(res);
-    };
-    const getAllMatch = async () => {
-      const res = await GET.getAllMatch();
-      const ongoing = res.data.filter((data) => {
-        return (
-          data.status === 'ongoing' &&
-          data.game_names === match?.data.game_names
-        );
-      });
-      const filtered = ongoing.slice(1, 3);
-
-      console.log(filtered);
-      setFilteredMatches(filtered);
-    };
-
     getMatchDetail();
-    getAllMatch();
   }, []);
+
+  useEffect(() => {
+    getAllMatch();
+  }, [match]);
 
   return (
     <main className="flex flex-col md:flex-row max-w-screen-xl mx-auto">
@@ -52,7 +57,9 @@ function Livestream() {
         <div className="bg-xport-black-light overflow-hidden rounded-md w-full aspect-video">
           <iframe
             className="w-full h-full"
-            src="https://www.youtube-nocookie.com/embed/jfKfPfyJRdk?si=TzxpZDgUIyoj43aa"
+            src={`https://www.youtube.com/embed/${parseVideoId(
+              match?.data.match_link
+            )}?si=a4q6Ta7KnMnohmVj`}
             title="YouTube video player"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
         </div>
@@ -150,7 +157,9 @@ function Livestream() {
                   key={id}
                   className="group relative overflow-hidden w-full aspect-video bg-xport-black-light rounded">
                   <Image
-                    src={`https://img.youtube.com/vi/jfKfPfyJRdk/sddefault.jpg`}
+                    src={`https://img.youtube.com/vi/${parseVideoId(
+                      match?.data.match_link
+                    )}/sddefault.jpg`}
                     alt={tournament_names}
                     fill
                     className="object-cover brightness-75 group-hover:brightness-100 transition-all duration-150"
@@ -165,6 +174,7 @@ function Livestream() {
         </div>
       </section>
       <BetSlipTab
+        gameIcon={match?.data.game_icons}
         chosenTeam={currentTeam}
         odds={currentOdds}
         teams={[match?.data.team_a_names, match?.data.team_b_names]}

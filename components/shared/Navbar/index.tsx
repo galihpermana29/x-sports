@@ -15,9 +15,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import LogoWithText from '../LogoWithText';
+import { usePathname } from 'next/navigation';
 
 function Navbar() {
   const [games, setGames] = useState<GamesData>();
+
+  const path = usePathname();
 
   useEffect(() => {
     const getAllGames = async () => {
@@ -29,7 +32,10 @@ function Navbar() {
   }, []);
 
   return (
-    <nav className="py-5 px-5 md:px-10 sticky top-0 z-30 bg-xport-black-light">
+    <nav
+      className={`py-5 px-5 md:px-10 top-0 z-30 bg-xport-black-light ${
+        path.includes('/cms') ? 'hidden' : 'sticky'
+      }`}>
       <div className="flex justify-between items-center max-w-screen-xl mx-auto">
         <Link href={'/'}>
           <LogoWithText className="h-16" />
