@@ -1,13 +1,24 @@
-import { Teams } from '@/utils/types';
+import { AllMatchData, GamesData, MatchDetailData } from '@/utils/types';
 import api from '.';
 
-async function getAllTeams(): Promise<Teams> {
-  const { data } = await api.get<Teams>(`/games`);
+async function getAllGames(): Promise<GamesData> {
+  const { data } = await api.get<GamesData>(`/games`);
+  return data;
+}
+
+async function getAllMatch(): Promise<AllMatchData> {
+  const { data } = await api.get<AllMatchData>(`/matchs`);
+  return data;
+}
+async function getMatchById(id: number): Promise<MatchDetailData> {
+  const { data } = await api.get<MatchDetailData>(`/matchs/${id}`);
   return data;
 }
 
 const GET = {
-  getAllTeams,
+  getAllGames,
+  getMatchById,
+  getAllMatch,
 };
 
 export default GET;

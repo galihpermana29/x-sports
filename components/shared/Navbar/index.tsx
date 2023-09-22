@@ -9,18 +9,19 @@ import NewsIcon from '@/components/icons/NewsIcon';
 import ReceiptIcon from '@/components/icons/ReceiptIcon';
 import ThreadsIcon from '@/components/icons/ThreadsIcon';
 import WalletIcon from '@/components/icons/WalletIcon';
-import { Teams } from '@/utils/types';
+import type { GamesData } from '@/utils/types';
 import { Menu, Transition } from '@headlessui/react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import LogoWithText from '../LogoWithText';
 
 function Navbar() {
-  const [games, setGames] = useState<Teams>();
+  const [games, setGames] = useState<GamesData>();
 
   useEffect(() => {
     const getAllGames = async () => {
-      const res = await GET.getAllTeams();
+      const res = await GET.getAllGames();
       setGames(res);
     };
 
@@ -28,7 +29,7 @@ function Navbar() {
   }, []);
 
   return (
-    <nav className="py-5 px-10 sticky top-0 z-30 bg-xport-black-light">
+    <nav className="py-5 px-5 md:px-10 sticky top-0 z-30 bg-xport-black-light">
       <div className="flex justify-between items-center max-w-screen-xl mx-auto">
         <Link href={'/'}>
           <LogoWithText className="h-16" />
@@ -69,16 +70,22 @@ function Navbar() {
                         'absolute left-0 mt-3 flex flex-col overflow-hidden rounded border border-xport-gray-primary divide-y divide-xport-gray-primary bg-xport-black-alternate shadow-xl'
                       }>
                       <div className="p-2">
-                        <p>List of Games</p>
+                        <p className="font-medium">List of Games</p>
                       </div>
-                      <div className="grid grid-rows-2 divide-y divide-x divide-xport-gray-primary">
-                        {games?.data?.map(({ game_names, id }) => {
+                      <div className="grid grid-cols-5 w-96 divide-xport-gray-primary">
+                        {games?.data?.map(({ game_names, id, game_icons }) => {
                           return (
                             <Menu.Item key={id}>
                               {() => (
-                                <div className="p-2 cursor-pointer hover:bg-xport-black-light transition-all duration-150 aspect-square flex flex-col gap-3 justify-center items-center">
-                                  <div className="w-10 h-10 bg-xport-black-light rounded-full animate-pulse"></div>
-                                  <span className="text-xs font-semibold text-white">
+                                <div className="p-5 w-26 h-full cursor-pointer hover:bg-xport-black-light transition-all duration-150 flex flex-col gap-3 justify-start items-center">
+                                  <div className="relative w-10 h-10 bg-xport-black-light rounded-full overflow-hidden">
+                                    <Image
+                                      src={game_icons}
+                                      alt={`${game_names} logo`}
+                                      fill
+                                    />
+                                  </div>
+                                  <span className="text-xs text-center font-semibold text-white">
                                     {game_names}{' '}
                                   </span>
                                 </div>
