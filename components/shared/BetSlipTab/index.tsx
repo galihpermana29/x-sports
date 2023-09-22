@@ -6,16 +6,18 @@ import ArrowDownIcon from '@/components/icons/ArrowDownIcon';
 import XIcon from '@/components/icons/XIcon';
 import { Listbox, Transition } from '@headlessui/react';
 import { useState, Fragment } from 'react';
+import Image from 'next/image';
 
 const bids = [5, 10, 20, 30, 50, 100];
 
 type BetData = {
   odds: number;
   teams: string[];
+  gameIcon: string;
   chosenTeam: string;
 };
 
-function BetSlipTab({ odds, teams, chosenTeam }: BetData) {
+function BetSlipTab({ odds, teams, chosenTeam, gameIcon }: BetData) {
   const [selectedPayout, setSelectedPayout] = useState<number>(bids[0]);
 
   return (
@@ -31,7 +33,15 @@ function BetSlipTab({ odds, teams, chosenTeam }: BetData) {
           </div>
           <div className="bg-xport-gray-primary px-3 py-2 flex flex-col gap-2">
             <div className="flex gap-2 items-center">
-              <div className="aspect-square h-8 rounded-full bg-xport-gray-alternate"></div>
+              <div className="aspect-square relative h-8 rounded-full bg-xport-gray-alternate">
+                <Image
+                  src={gameIcon}
+                  alt={'Game Icon'}
+                  fill
+                  className="object-cover"
+                  sizes="100vw"
+                />
+              </div>
               <span className="font-semibold text-xport-game-mlbb text-base md:text-xs">
                 {teams[0] ?? '-'} vs {teams[1] ?? '-'}
               </span>

@@ -15,9 +15,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import LogoWithText from '../LogoWithText';
+import { usePathname } from 'next/navigation';
 
 function Navbar() {
   const [games, setGames] = useState<GamesData>();
+
+  const path = usePathname();
 
   useEffect(() => {
     const getAllGames = async () => {
@@ -29,7 +32,10 @@ function Navbar() {
   }, []);
 
   return (
-    <nav className="py-5 px-5 md:px-10 sticky top-0 z-30 bg-xport-black-light">
+    <nav
+      className={`py-5 px-5 md:px-10 top-0 z-30 bg-xport-black-light ${
+        path.includes('/cms') ? 'hidden' : 'sticky'
+      }`}>
       <div className="flex justify-between items-center max-w-screen-xl mx-auto">
         <Link href={'/'}>
           <LogoWithText className="h-16" />
@@ -77,18 +83,21 @@ function Navbar() {
                           return (
                             <Menu.Item key={id}>
                               {() => (
-                                <div className="p-5 w-26 h-full cursor-pointer hover:bg-xport-black-light transition-all duration-150 flex flex-col gap-3 justify-start items-center">
+                                <Link
+                                  href={`/game?game_id=${id}`}
+                                  className="p-5 w-26 h-full cursor-pointer hover:bg-xport-black-light transition-all duration-150 flex flex-col gap-3 justify-start items-center">
                                   <div className="relative w-10 h-10 bg-xport-black-light rounded-full overflow-hidden">
                                     <Image
                                       src={game_icons}
                                       alt={`${game_names} logo`}
                                       fill
+                                      sizes="100vh"
                                     />
                                   </div>
                                   <span className="text-xs text-center font-semibold text-white">
                                     {game_names}{' '}
                                   </span>
-                                </div>
+                                </Link>
                               )}
                             </Menu.Item>
                           );
