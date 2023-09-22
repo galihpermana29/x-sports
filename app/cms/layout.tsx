@@ -13,6 +13,8 @@ export default function CMSLayout({ children }: { children: React.ReactNode }) {
     '/cms/home/ongoing',
     '/cms/home/games',
     '/cms/home/teams',
+    '/cms/home/news',
+    '/cms/home/completed',
   ];
 
   useEffect(() => {
