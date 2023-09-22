@@ -27,7 +27,7 @@ function Livestream() {
       const res = await GET.getAllMatch();
       const ongoing = res.data.filter((data) => {
         return (
-          data.status === 'upcoming' &&
+          data.status === 'ongoing' &&
           data.game_names === match?.data.game_names
         );
       });

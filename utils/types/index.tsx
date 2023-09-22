@@ -23,7 +23,7 @@ export type MatchDetail = {
   team_b_icons: string;
   date: string;
   match_link: string;
-  status: string;
+  status: 'upcoming' | 'ongoing' | 'completed';
   winner: number;
 };
 
