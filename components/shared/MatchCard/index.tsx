@@ -24,7 +24,7 @@ function MatchCard(props: MatchDetail) {
             src={game_icons}
             alt={`${game_names} logo`}
             fill
-            sizes="100vw"
+            sizes="100vh"
             className="object-cover"
           />
         </div>
@@ -38,7 +38,7 @@ function MatchCard(props: MatchDetail) {
                 src={team_a_icons}
                 alt={`${team_a_names} logo`}
                 fill
-                sizes="100vw"
+                sizes="100vh"
                 className="object-cover"
               />
             </div>
@@ -58,7 +58,7 @@ function MatchCard(props: MatchDetail) {
                 src={team_b_icons}
                 alt={`${team_b_names} logo`}
                 fill
-                sizes="100vw"
+                sizes="100vh"
                 className="object-cover"
               />
             </div>

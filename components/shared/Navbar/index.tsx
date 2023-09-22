@@ -83,18 +83,21 @@ function Navbar() {
                           return (
                             <Menu.Item key={id}>
                               {() => (
-                                <div className="p-5 w-26 h-full cursor-pointer hover:bg-xport-black-light transition-all duration-150 flex flex-col gap-3 justify-start items-center">
+                                <Link
+                                  href={`/game?game_id=${id}`}
+                                  className="p-5 w-26 h-full cursor-pointer hover:bg-xport-black-light transition-all duration-150 flex flex-col gap-3 justify-start items-center">
                                   <div className="relative w-10 h-10 bg-xport-black-light rounded-full overflow-hidden">
                                     <Image
                                       src={game_icons}
                                       alt={`${game_names} logo`}
                                       fill
+                                      sizes="100vh"
                                     />
                                   </div>
                                   <span className="text-xs text-center font-semibold text-white">
                                     {game_names}{' '}
                                   </span>
-                                </div>
+                                </Link>
                               )}
                             </Menu.Item>
                           );

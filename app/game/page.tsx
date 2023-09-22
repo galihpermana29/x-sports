@@ -10,17 +10,20 @@ import RectangleSkeleton from '@/components/shared/RectangleSkeleton';
 import { Game, MatchDetail, News } from '@/utils/types';
 import { Listbox, Transition } from '@headlessui/react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { Fragment, useEffect, useState } from 'react';
 
 function GamePage() {
+  const param = useSearchParams();
+  const parsedParam = parseInt(param.get('game_id'));
+  const paramId = isNaN(parsedParam) ? 1 : parsedParam;
+
   const [ongoingMatches, setOngoingMatches] = useState<MatchDetail[]>();
   const [news, setNews] = useState<News[]>();
   const [gameList, setGameList] = useState<Game[]>([]);
-  const [currentGame, setCurrentGame] = useState<Game>({
-    id: 1,
-    game_names: 'Mobile Legends',
-    game_icons: null,
-  });
+  const [currentId, setCurrentId] = useState<number>(paramId);
+
+  const currentGame = gameList?.find((el) => el.id === currentId);
 
   const getGames = async () => {
     const res = await GET.getAllGames();
@@ -30,43 +33,43 @@ function GamePage() {
   const getNews = async () => {
     const res = await GET.getAllNews();
     const filteredNews = res.data.filter((data, index) => {
-      return data.game_names === currentGame.game_names && index < 5;
+      return data.game_id === currentId && index < 5;
     });
     setNews(filteredNews);
   };
 
   const getMatchDetail = async () => {
-    const res = await GET.getAllMatch();
+    const res = await GET.getMatchByGameId(currentId);
     const ongoing = res.data.filter((data, index) => {
-      return (
-        data.status === 'ongoing' &&
-        data.game_names === currentGame.game_names &&
-        index < 5
-      );
+      return data.status === 'ongoing' && index < 5;
     });
     setOngoingMatches(ongoing);
   };
 
   useEffect(() => {
+    setCurrentId(paramId);
+  }, [param]);
+
+  useEffect(() => {
     getGames();
     getMatchDetail();
     getNews();
-  }, []);
+  }, [paramId]);
 
   useEffect(() => {
     getMatchDetail();
     getNews();
-  }, [currentGame]);
+  }, [currentId]);
 
   return (
     <main className="flex flex-col gap-10 max-w-screen-xl mx-auto px-5 py-10 md:px-10">
       <section className="w-full">
-        <Listbox value={currentGame} onChange={setCurrentGame}>
+        <Listbox value={currentId} onChange={setCurrentId}>
           <div className="relative text-base md:text-xs w-full">
             <Listbox.Button className="group mb-10 min-w-[12rem] bg-xport-black-light border border-xport-light py-3 pl-3 pr-2 rounded-md text-end flex items-center justify-between">
               <div className="flex items-center gap-1 mr-10">
                 <span className="block font-medium">
-                  {currentGame.game_names}
+                  {currentGame?.game_names}
                 </span>
               </div>
               <ArrowDownIcon className="w-4 h-4 fill-xport-light" />
@@ -90,7 +93,7 @@ function GamePage() {
                           : 'text-white'
                       }`
                     }
-                    value={game}>
+                    value={game.id}>
                     {({ selected }) => (
                       <>
                         <span
@@ -108,11 +111,11 @@ function GamePage() {
           </div>
         </Listbox>
         <Link
-          href={`/game/${currentGame.id}`}
+          href={`/game/${currentId}`}
           className="font-semibold flex items-center">
           <h2>
             <span className="text-xport-orange-primary">
-              {currentGame.game_names}
+              {currentGame?.game_names}
             </span>{' '}
             Today&apos;s Match{' '}
           </h2>
@@ -141,7 +144,7 @@ function GamePage() {
         <Link href={`/news`} className="font-semibold flex items-center">
           <h2>
             <span className="text-xport-orange-primary">
-              {currentGame.game_names}
+              {currentGame?.game_names}
             </span>{' '}
             Latest News{' '}
           </h2>

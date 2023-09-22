@@ -21,7 +21,7 @@ function NewsCard({
           src={image_news}
           alt={title}
           fill
-          sizes="100vw"
+          sizes="100vh"
           className="object-cover"
         />
       </div>
