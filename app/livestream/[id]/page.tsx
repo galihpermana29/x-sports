@@ -29,7 +29,7 @@ function Livestream() {
     const ongoing = res.data.filter((data, index) => {
       return (
         data.id !== match?.data.id &&
-        data.status === 'upcoming' &&
+        data.status === 'ongoing' &&
         data.game_names === match?.data.game_names &&
         index < 3
       );

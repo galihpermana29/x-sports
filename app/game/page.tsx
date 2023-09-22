@@ -39,7 +39,7 @@ function GamePage() {
     const res = await GET.getAllMatch();
     const ongoing = res.data.filter((data, index) => {
       return (
-        data.status === 'upcoming' &&
+        data.status === 'ongoing' &&
         data.game_names === currentGame.game_names &&
         index < 5
       );
