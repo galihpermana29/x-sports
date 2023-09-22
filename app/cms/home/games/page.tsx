@@ -1,6 +1,6 @@
 'use client';
 import { Table, Button } from 'antd';
-export default function Ongoing() {
+export default function Games() {
   const dataSource = [
     {
       key: '1',
@@ -37,9 +37,7 @@ export default function Ongoing() {
     <div className="p-[50px]">
       <div className="flex justify-between mb-[50px]">
         <div>
-          <h1 className="text-[32px] font-[600]">
-            Ongoing and Upcoming Matches
-          </h1>
+          <h1 className="text-[32px] font-[600]">Games</h1>
         </div>
         <div>
           <Button size="large" className="bg-black text-white">
