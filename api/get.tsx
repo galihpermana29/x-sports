@@ -1,17 +1,17 @@
 import { AllMatchData, GamesData, MatchDetailData } from '@/utils/types';
-import api from '.';
+import { clientApi } from '.';
 
 async function getAllGames(): Promise<GamesData> {
-  const { data } = await api.get<GamesData>(`/games`);
+  const { data } = await clientApi.get<GamesData>(`/games`);
   return data;
 }
 
 async function getAllMatch(): Promise<AllMatchData> {
-  const { data } = await api.get<AllMatchData>(`/matchs`);
+  const { data } = await clientApi.get<AllMatchData>(`/matchs`);
   return data;
 }
 async function getMatchById(id: number): Promise<MatchDetailData> {
-  const { data } = await api.get<MatchDetailData>(`/matchs/${id}`);
+  const { data } = await clientApi.get<MatchDetailData>(`/matchs/${id}`);
   return data;
 }
 

@@ -1,6 +1,8 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { getBearerToken } from './token';
 const BEARER_TOKEN = getBearerToken();
+const STATIC_BEARER_TOKEN =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbl9pZCI6MSwiZW1haWwiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE3MzExMjQ2NzN9.e-SrlKolTgUqRVZrK73fnPdpal1qJvL8hEmxMm7MEM4';
 
 export const API_URL = 'https://api.x-sports.site/api/v1';
 
@@ -34,6 +36,33 @@ const createAPI = (
   return axiosInstance;
 };
 
-const api = createAPI();
+const createClientAPI = (
+  baseURL: string = API_URL,
+  config: ApiConfig = {}
+): AxiosInstance => {
+  const axiosInstance = axios.create({
+    baseURL,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${STATIC_BEARER_TOKEN}`,
+    },
+    ...config,
+  });
 
-export default api;
+  axiosInstance.interceptors.response.use(
+    (response) => {
+      return response;
+    },
+
+    (error) => {
+      console.log(error);
+      return Promise.reject(error);
+    }
+  );
+  return axiosInstance;
+};
+
+const cmsApi = createAPI();
+const clientApi = createClientAPI();
+
+export { cmsApi, clientApi };
