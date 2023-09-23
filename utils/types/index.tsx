@@ -50,3 +50,7 @@ export type News = {
 export type NewsData = {
   data: News[];
 };
+
+export type NewsDetailData = {
+  data: News;
+};

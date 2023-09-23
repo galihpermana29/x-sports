@@ -3,6 +3,7 @@ import {
   GamesData,
   MatchDetailData,
   NewsData,
+  NewsDetailData,
 } from '@/utils/types';
 import { clientApi } from '.';
 
@@ -26,6 +27,11 @@ async function getMatchByGameId(id: number): Promise<AllMatchData> {
   return data;
 }
 
+async function getNewsById(id: number): Promise<NewsDetailData> {
+  const { data } = await clientApi.get<NewsDetailData>(`/news/${id}`);
+  return data;
+}
+
 async function getAllNews(): Promise<NewsData> {
   const { data } = await clientApi.get<NewsData>(`/news`);
   return data;
@@ -37,6 +43,7 @@ const GET = {
   getAllMatch,
   getAllNews,
   getMatchByGameId,
+  getNewsById,
 };
 
 export default GET;
