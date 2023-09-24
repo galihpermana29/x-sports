@@ -144,9 +144,9 @@ function Livestream() {
               <ArrowRightIcon className="w-3 h-3 ml-2" />
             </span>
           </Link>
-          <div className="grid grid-cols-3 gap-3">
-            {filteredMatches?.length <= 0 && (
-              <div className="w-full aspect-video bg-xport-black-light text-xport-gray-primary font-medium flex justify-center items-center italic rounded">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
+            {filteredMatches?.length === 0 && (
+              <div className=" text-xport-gray-primary font-medium italic">
                 No Ongoing Matches
               </div>
             )}
