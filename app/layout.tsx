@@ -2,6 +2,7 @@ import Navbar from '@/components/shared/Navbar';
 import type { Metadata } from 'next';
 import { Montserrat } from 'next/font/google';
 import './globals.scss';
+import { AuthProvider } from '@/context/Web3AuthContext';
 
 const mainFont = Montserrat({ subsets: ['latin'] });
 
@@ -18,8 +19,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={mainFont.className}>
-        <Navbar />
-        {children}
+        <AuthProvider>
+          <Navbar />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );
