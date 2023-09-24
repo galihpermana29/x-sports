@@ -10,6 +10,10 @@ import { useEffect, useState } from 'react';
 export default function Teams() {
   const [form] = Form.useForm();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [type, setType] = useState<{
+    nameType: 'edit' | 'create' | null;
+    id?: number;
+  }>(null);
   const [datas, setDatas] = useState<TeamObjectP[]>();
   const [datasGames, setDatasGames] =
     useState<{ label: string; value: number }[]>();
@@ -19,8 +23,13 @@ export default function Teams() {
     form.validateFields().then(async () => {
       const value = form.getFieldsValue();
       try {
-        await CmsAPI.createTeams(value);
+        if (type.nameType === 'edit') {
+          await CmsAPI.updateTeams(value, type.id);
+        } else {
+          await CmsAPI.createTeams(value);
+        }
         getAllTeams();
+        form.resetFields();
         setIsModalOpen(false);
       } catch (error) {
         const axiosError = error as AxiosError; // Cast error to AxiosError
@@ -49,8 +58,8 @@ export default function Teams() {
     },
     {
       title: 'Icon',
-      dataIndex: 'game_icons',
-      key: 'game_icons',
+      dataIndex: 'team_icons',
+      key: 'team_icons',
       render: (icon: string) => (
         <Image loader={() => icon} src={icon} alt="d" width={30} height={30} />
       ),
@@ -63,6 +72,7 @@ export default function Teams() {
         <Button
           onClick={() => {
             setIsModalOpen(true);
+            setType({ nameType: 'edit', id: data.id });
             form.setFieldsValue(data);
           }}>
           Edit
@@ -131,13 +141,16 @@ export default function Teams() {
       </Modal>
       <div className="flex justify-between mb-[50px]">
         <div>
-          <h1 className="text-[32px] font-[600]">Teams</h1>
+          <h1 className="text-[32px] font-[600] text-black">Teams</h1>
         </div>
         <div>
           <Button
             size="large"
             className="bg-black text-white"
-            onClick={() => setIsModalOpen(true)}>
+            onClick={() => {
+              setType({ nameType: 'create' });
+              setIsModalOpen(true);
+            }}>
             Create New
           </Button>
         </div>

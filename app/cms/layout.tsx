@@ -1,6 +1,7 @@
 'use client';
 import Sidebar from '@/components/cms/Navbar';
 import Navbar from '@/components/cms/TopNav';
+import { AuthProvider } from '@/context/Web3AuthContext';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -33,8 +34,12 @@ export default function CMSLayout({ children }: { children: React.ReactNode }) {
               <Sidebar />
             </div>
             <div className="flex-1">
-              <Navbar />
-              <div className="border-2 ml-[300px]">{children}</div>
+              <AuthProvider>
+                <Navbar />
+                <div className="ml-[300px] !bg-white min-h-screen">
+                  {children}
+                </div>
+              </AuthProvider>
             </div>
           </div>
         ) : (

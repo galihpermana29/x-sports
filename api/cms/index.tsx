@@ -23,7 +23,12 @@ async function getGames(): Promise<GamesResponseI> {
 }
 
 async function getMatches(): Promise<MatchResponseI> {
-  const { data } = await cmsApi.get<MatchResponseI>('/matchs');
+  const { data } = await cmsApi.get<MatchResponseI>(`/matchs`);
+  return data;
+}
+
+async function getCompletedMatches(): Promise<MatchResponseI> {
+  const { data } = await cmsApi.get<MatchResponseI>(`/matchs?status=completed`);
   return data;
 }
 
@@ -65,8 +70,31 @@ async function createTeams(payload: TeamsPayloadI): Promise<{ data: number }> {
   const { data } = await cmsApi.post<{ data: number }>('/teams', payload);
   return data;
 }
+
+async function updateTeams(
+  payload: TeamsPayloadI,
+  id: number
+): Promise<{ data: number }> {
+  const { data } = await cmsApi.patch<{ data: number }>(
+    `/teams/${id}`,
+    payload
+  );
+  return data;
+}
+
 async function createGames(payload: GamesPayloadI): Promise<{ data: number }> {
   const { data } = await cmsApi.post<{ data: number }>('/games', payload);
+  return data;
+}
+
+async function updateGames(
+  payload: GamesPayloadI,
+  id: number
+): Promise<{ data: number }> {
+  const { data } = await cmsApi.patch<{ data: number }>(
+    `/games/${id}`,
+    payload
+  );
   return data;
 }
 
@@ -87,6 +115,9 @@ const CmsAPI = {
   getNews,
   createNews,
   updateNews,
+  updateTeams,
+  updateGames,
+  getCompletedMatches,
 };
 
 export default CmsAPI;

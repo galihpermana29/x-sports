@@ -42,6 +42,7 @@ export default function News() {
         }
         getAllNews();
         setIsModalOpen(false);
+        form.resetFields();
       } catch (error) {
         const axiosError = error as AxiosError; // Cast error to AxiosError
         const responseData = axiosError.response?.data as
@@ -180,7 +181,7 @@ export default function News() {
       </Modal>
       <div className="flex justify-between mb-[50px]">
         <div>
-          <h1 className="text-[32px] font-[600]">News</h1>
+          <h1 className="text-[32px] font-[600] text-black">News</h1>
         </div>
         <div>
           <Button
