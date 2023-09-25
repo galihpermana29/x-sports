@@ -54,3 +54,18 @@ export type NewsData = {
 export type NewsDetailData = {
   data: News;
 };
+
+export type Threads = {
+  id: number;
+  title: string;
+  game_id: number;
+  game_names: string;
+  game_icons: string;
+  description: string;
+  image_thread: string;
+  date: string;
+};
+
+export type ThreadsData = {
+  data: Threads[];
+};
