@@ -1,62 +1,65 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
-
 import GET from '@/api/get';
 import FireIcon from '@/components/icons/FIreIcon';
 import GameIcon from '@/components/icons/GameIcon';
-import { News } from '@/utils/types';
+import UserIcon from '@/components/icons/UserIcon';
+import { Threads } from '@/utils/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-function NewsDetailPage() {
+function ThreadsDetailPage() {
   const path = usePathname();
   const newsId = parseInt(path.split('/').pop());
 
-  const [newsDetail, setNewsDetail] = useState<News>();
-  const [hotNews, setHotNews] = useState<News[]>();
+  const [threadDetail, setThreadDetail] = useState<Threads>();
+  const [hotThreads, setHotThreads] = useState<Threads[]>();
 
-  console.log(hotNews);
+  const getThreadsById = async () => {
+    const { data } = await GET.getThreadById(newsId);
 
-  const getNewsById = async () => {
-    const res = await GET.getNewsById(newsId);
-
-    setNewsDetail(res.data);
+    setThreadDetail(data);
   };
 
-  const getNews = async () => {
-    const res = await GET.getAllNews();
-    const filtered = res.data.filter((item, index) => {
+  const getThreads = async () => {
+    const { data } = await GET.getAllThreads();
+    const filtered = data.filter((item, index) => {
       return item.id !== newsId && index < 6;
     });
-    setHotNews(filtered);
+    setHotThreads(filtered);
   };
 
   useEffect(() => {
-    getNewsById();
-    getNews();
+    getThreads();
+    getThreadsById();
   }, []);
 
   return (
     <main className="flex flex-col md:flex-row gap-5 max-w-screen-xl mx-auto px-5 py-10 md:px-10">
-      <section className="basis-[60%] lg:basis-[70%] h-fit flex flex-col gap-5 p-5 w-full bg-xport-black-light rounded-md">
-        <h1 className="font-semibold text-2xl">{newsDetail?.title}</h1>
+      <section className="basis-[60%] lg:basis-[70%] flex flex-col gap-5 p-5 w-full bg-xport-black-light rounded-md">
+        <div className="text-xport-light font-medium flex gap-2 items-center">
+          <UserIcon className="fill-xport-light w-7 h-7" />
+          <span>Admin</span>
+        </div>
+        <h1 className="font-semibold text-2xl">{threadDetail?.title}</h1>
         <div className="flex gap-4 items-center text-xport-gray-primary font-medium">
           <div className="flex items-center gap-2">
             <GameIcon className="h-7 w-7 fill-xport-gray-primary" />
-            <span>{newsDetail?.game_names}</span>
+            <span>{threadDetail?.game_names}</span>
           </div>
-          <span>{newsDetail?.date}</span>
+          <span>{threadDetail?.date}</span>
         </div>
         <div className="w-full relative rounded overflow-hidden bg-xport-gray-alternate aspect-video">
           <Image
-            src={newsDetail?.image_news}
-            alt={newsDetail?.title}
+            src={threadDetail?.image_thread}
+            alt={threadDetail?.title}
             fill
             className="object-cover"
           />
         </div>
-        <p className="text-sm">{newsDetail?.description}</p>
+        <p className="text-sm">{threadDetail?.description}</p>
       </section>
       <aside className="basis-[40%] overflow-hidden lg:basis-[30%] w-full h-fit rounded-md bg-xport-black-light">
         <div className="flex px-5 pt-5 items-center gap-2 text-lg font-semibold">
@@ -64,10 +67,10 @@ function NewsDetailPage() {
           <h3>Hot Threads</h3>
         </div>
         <div className="flex flex-col mt-5">
-          {hotNews?.map(({ id, title, game_names, image_news }) => {
+          {hotThreads?.map(({ id, title, game_names, image_thread }) => {
             return (
               <Link
-                href={`/news/${id}`}
+                href={`/threads/${id}`}
                 key={id}
                 className="flex gap-2 cursor-pointer p-5 hover:bg-xport-gray-alternate transition-all duration-150">
                 <div className="basis-[70%] font-medium w-full flex flex-col justify-between">
@@ -83,7 +86,7 @@ function NewsDetailPage() {
                 <div className="basis-[30%]">
                   <div className="bg-xport-gray-alternate relative overflow-hidden rounded w-full aspect-square">
                     <Image
-                      src={image_news}
+                      src={image_thread}
                       alt={title}
                       fill
                       className="object-cover"
@@ -99,4 +102,4 @@ function NewsDetailPage() {
   );
 }
 
-export default NewsDetailPage;
+export default ThreadsDetailPage;
