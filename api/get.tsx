@@ -5,6 +5,7 @@ import {
   NewsData,
   NewsDetailData,
   ThreadsData,
+  ThreadsDetailData,
 } from '@/utils/types';
 import { clientApi } from '.';
 
@@ -43,6 +44,11 @@ async function getAllThreads(): Promise<ThreadsData> {
   return data;
 }
 
+async function getThreadById(id: number): Promise<ThreadsDetailData> {
+  const { data } = await clientApi.get<ThreadsDetailData>(`/threads/${id}`);
+  return data;
+}
+
 const GET = {
   getAllGames,
   getMatchById,
@@ -51,6 +57,7 @@ const GET = {
   getMatchByGameId,
   getNewsById,
   getAllThreads,
+  getThreadById,
 };
 
 export default GET;

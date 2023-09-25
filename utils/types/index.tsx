@@ -69,3 +69,7 @@ export type Threads = {
 export type ThreadsData = {
   data: Threads[];
 };
+
+export type ThreadsDetailData = {
+  data: Threads;
+};
