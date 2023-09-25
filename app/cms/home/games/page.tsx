@@ -12,14 +12,23 @@ export default function Games() {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [datas, setDatas] = useState<GamesObjectP[]>();
   const [loading, setLoading] = useState<boolean>(false);
+  const [type, setType] = useState<{
+    nameType: 'edit' | 'create' | null;
+    id?: number;
+  }>(null);
 
   const handleOk = () => {
     form.validateFields().then(async () => {
       const value = form.getFieldsValue();
       try {
-        await CmsAPI.createGames(value);
+        if (type.nameType === 'edit') {
+          await CmsAPI.updateGames(value, type.id);
+        } else {
+          await CmsAPI.createGames(value);
+        }
         getAllGames();
         setIsModalOpen(false);
+        form.resetFields();
       } catch (error) {
         const axiosError = error as AxiosError; // Cast error to AxiosError
         const responseData = axiosError.response?.data as
@@ -56,6 +65,7 @@ export default function Games() {
         <Button
           onClick={() => {
             setIsModalOpen(true);
+            setType({ nameType: 'edit', id: data.id });
             form.setFieldsValue(data);
           }}>
           Edit
@@ -114,13 +124,16 @@ export default function Games() {
       </Modal>
       <div className="flex justify-between mb-[50px]">
         <div>
-          <h1 className="text-[32px] font-[600]">Teams</h1>
+          <h1 className="text-[32px] font-[600] text-black">Games</h1>
         </div>
         <div>
           <Button
             size="large"
             className="bg-black text-white"
-            onClick={() => setIsModalOpen(true)}>
+            onClick={() => {
+              setType({ nameType: 'create' });
+              setIsModalOpen(true);
+            }}>
             Create New
           </Button>
         </div>

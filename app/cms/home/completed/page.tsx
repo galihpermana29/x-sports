@@ -1,46 +1,23 @@
 'use client';
 import CmsAPI from '@/api/cms';
-import ImageUpload from '@/components/cms/Upload';
-import { TeamObjectP } from '@/utils/interface';
-import { Table, Button, Modal, Form, Input, Select, message } from 'antd';
-import { AxiosError } from 'axios';
-import Image from 'next/image';
+import { MatchObjectI } from '@/utils/interface';
+import { Table } from 'antd';
 import { useEffect, useState } from 'react';
 
 export default function Completed() {
-  const [form] = Form.useForm();
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [datas, setDatas] = useState<TeamObjectP[]>();
-  const [datasGames, setDatasGames] =
-    useState<{ label: string; value: number }[]>();
+  const [datas, setDatas] = useState<MatchObjectI[]>();
   const [loading, setLoading] = useState<boolean>(false);
-
-  const handleOk = () => {
-    form.validateFields().then(async () => {
-      const value = form.getFieldsValue();
-      try {
-        await CmsAPI.createTeams(value);
-        getAllTeams();
-        setIsModalOpen(false);
-      } catch (error) {
-        const axiosError = error as AxiosError; // Cast error to AxiosError
-        const responseData = axiosError.response?.data as
-          | { errors: string[] }
-          | undefined;
-        const err = responseData
-          ? responseData?.errors[0]
-          : 'Ouch, an error happen!';
-
-        message.error(err);
-      }
-    });
-  };
 
   const columns = [
     {
-      title: 'Team Name',
-      dataIndex: 'team_names',
-      key: 'team_names',
+      title: 'Match ID',
+      dataIndex: 'id',
+      key: 'id',
+    },
+    {
+      title: 'Tournament Name',
+      dataIndex: 'tournament_names',
+      key: 'tournament_names',
     },
     {
       title: 'Game',
@@ -48,43 +25,49 @@ export default function Completed() {
       key: 'game_names',
     },
     {
-      title: 'Icon',
-      dataIndex: 'game_icons',
-      key: 'game_icons',
-      render: (icon: string) => (
-        <Image loader={() => icon} src={icon} alt="d" width={30} height={30} />
-      ),
+      title: 'Team A',
+      dataIndex: 'team_a_names',
+      key: 'team_a_names',
     },
     {
-      title: 'Action',
-      dataIndex: '',
-      key: 'action',
-      render: (data: TeamObjectP) => (
-        <Button
-          onClick={() => {
-            setIsModalOpen(true);
-            form.setFieldsValue(data);
-          }}>
-          Edit
-        </Button>
+      title: ' A Odds',
+      dataIndex: 'team_a_odds',
+      key: 'team_a_odds',
+    },
+    {
+      title: 'Team B',
+      dataIndex: 'team_b_names',
+      key: 'team_b_names',
+    },
+
+    {
+      title: ' B Odds',
+      dataIndex: 'team_b_odds',
+      key: 'team_b_odds',
+    },
+    {
+      title: 'Date',
+      dataIndex: 'date',
+      key: 'date',
+    },
+    {
+      title: 'Match Link',
+      dataIndex: 'match_link',
+      key: 'match_link',
+      render: (match_link: string) => (
+        <div className="max-w-[150px]">{match_link}</div>
       ),
     },
   ];
 
-  const getAllTeams = async () => {
+  const getAllMatch = async () => {
     try {
       setLoading(true);
-      const { data: dataGames } = await CmsAPI.getGames();
-      const { data } = await CmsAPI.getTeams();
+      const { data } = await CmsAPI.getCompletedMatches();
       const newMap = data.map((d) => ({
         ...d,
         key: d.id,
       }));
-      const gamesNewMap = dataGames.map((d) => ({
-        label: d.game_names,
-        value: d.id,
-      }));
-      setDatasGames(gamesNewMap);
       setDatas(newMap);
     } catch (error) {
       console.log(error, 'error');
@@ -94,52 +77,13 @@ export default function Completed() {
   };
 
   useEffect(() => {
-    getAllTeams();
+    getAllMatch();
   }, []);
   return (
     <div className="p-[50px]">
-      <Modal
-        title="Add New Team"
-        okText={'Add'}
-        okButtonProps={{
-          className: 'bg-black text-white',
-        }}
-        open={isModalOpen}
-        onOk={handleOk}
-        onCancel={() => setIsModalOpen(false)}>
-        <Form layout="vertical" className="my-[20px]" form={form}>
-          <Form.Item
-            rules={[{ required: true, message: 'team name is required' }]}
-            label="Team Name"
-            name={'team_names'}
-            className="mb-[10px]">
-            <Input placeholder="Team Name" />
-          </Form.Item>
-          <Form.Item
-            rules={[{ required: true, message: 'game name is required' }]}
-            label="Game"
-            name={'game_id'}>
-            <Select style={{ width: '100%' }} options={datasGames} />
-          </Form.Item>
-          <Form.Item
-            name="team_icons"
-            label="Game Icons"
-            rules={[{ required: true, message: 'game icon is required' }]}>
-            <ImageUpload form={form} name={'team_icons'} />
-          </Form.Item>
-        </Form>
-      </Modal>
       <div className="flex justify-between mb-[50px]">
         <div>
-          <h1 className="text-[32px] font-[600]">Teams</h1>
-        </div>
-        <div>
-          <Button
-            size="large"
-            className="bg-black text-white"
-            onClick={() => setIsModalOpen(true)}>
-            Create New
-          </Button>
+          <h1 className="text-[32px] font-[600] text-black">Completed Match</h1>
         </div>
       </div>
       <div>

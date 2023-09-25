@@ -36,6 +36,7 @@ export default function Ongoing() {
         await CmsAPI.createMatch(payload);
         getAllMatch();
         setIsModalOpen(false);
+        form.resetFields();
       } catch (error) {
         const axiosError = error as AxiosError; // Cast error to AxiosError
         const responseData = axiosError.response?.data as
@@ -215,7 +216,9 @@ export default function Ongoing() {
       </Modal>
       <div className="flex justify-between mb-[50px]">
         <div>
-          <h1 className="text-[32px] font-[600]">Ongoing & Upcoming Match</h1>
+          <h1 className="text-[32px] font-[600] text-black">
+            Ongoing & Upcoming Match
+          </h1>
         </div>
         <div>
           <Button

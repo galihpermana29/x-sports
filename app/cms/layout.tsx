@@ -34,7 +34,9 @@ export default function CMSLayout({ children }: { children: React.ReactNode }) {
             </div>
             <div className="flex-1">
               <Navbar />
-              <div className="border-2 ml-[300px]">{children}</div>
+              <div className="ml-[300px] !bg-white min-h-screen">
+                {children}
+              </div>
             </div>
           </div>
         ) : (
