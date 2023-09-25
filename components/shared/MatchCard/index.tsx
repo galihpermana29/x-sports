@@ -14,6 +14,8 @@ function MatchCard(props: MatchDetail) {
     team_b_names,
     team_b_odds,
     id,
+    status,
+    date,
   } = props;
 
   return (
@@ -65,16 +67,33 @@ function MatchCard(props: MatchDetail) {
           </div>
         </div>
       </div>
-      <Link
-        href={`/livestream/${id}`}
-        className="md:basis-[20%] bg-xport-gray-alternate md:bg-transparent md:py-0 group cursor-pointer flex justify-center items-center font-medium">
-        <div className="grow flex justify-center items-center px-1">
-          <span>Join Livestream</span>
+      {status === 'ongoing' && (
+        <Link
+          href={`/livestream/${id}`}
+          className={`md:basis-[20%] bg-xport-gray-alternate md:bg-transparent md:py-0 group cursor-pointer flex justify-center items-center font-medium ${
+            status === 'ongoing'
+              ? 'bg-gradient-to-l from-xport-orange-primary'
+              : ''
+          }`}>
+          <div className="grow flex gap-2 justify-center items-center px-1">
+            <div className="h-2 w-2 rounded-full bg-xport-orange-primary"></div>
+            <span>Join Livestream</span>
+          </div>
+          <div className="flex items-center py-3 md:py-0 bg-xport-gray-primary group-hover:bg-xport-orange-primary transition-all duration-150 h-full">
+            <ArrowDownIcon className="h-5 w-5 fill-slate-50 -rotate-90" />
+          </div>
+        </Link>
+      )}
+      {status === 'upcoming' && (
+        <div className="md:basis-[20%] bg-xport-gray-alternate md:bg-transparent md:py-0 group flex justify-center items-center font-medium">
+          <div className="grow flex justify-center items-center px-1">
+            <span>{date}</span>
+          </div>
+          <div className="flex items-center py-3 md:py-0 bg-xport-gray-primary h-full">
+            <ArrowDownIcon className="h-5 w-5 fill-slate-50 -rotate-90" />
+          </div>
         </div>
-        <div className="flex items-center py-3 md:py-0 bg-xport-gray-primary group-hover:bg-xport-orange-primary transition-all duration-150 h-full">
-          <ArrowDownIcon className="h-5 w-5 fill-slate-50 -rotate-90" />
-        </div>
-      </Link>
+      )}
     </div>
   );
 }

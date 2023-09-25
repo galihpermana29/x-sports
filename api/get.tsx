@@ -19,6 +19,15 @@ async function getAllMatch(): Promise<AllMatchData> {
   return data;
 }
 
+async function getMatchByStatus(
+  status?: 'upcoming' | 'ongoing' | 'completed'
+): Promise<AllMatchData> {
+  const { data } = await clientApi.get<AllMatchData>(
+    `/matchs?status=${status}`
+  );
+  return data;
+}
+
 async function getMatchById(id: number): Promise<MatchDetailData> {
   const { data } = await clientApi.get<MatchDetailData>(`/matchs/${id}`);
   return data;
@@ -53,6 +62,7 @@ const GET = {
   getAllGames,
   getMatchById,
   getAllMatch,
+  getMatchByStatus,
   getAllNews,
   getMatchByGameId,
   getNewsById,

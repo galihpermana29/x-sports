@@ -8,6 +8,10 @@ export type GamesData = {
   data: Game[];
 };
 
+export type GamesDetailData = {
+  data: Game;
+};
+
 export type MatchDetail = {
   id: number;
   tournament_names: string;
