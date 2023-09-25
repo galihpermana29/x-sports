@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
 import GET from '@/api/get';
@@ -164,7 +165,7 @@ function Livestream() {
                     fill
                     className="object-cover brightness-75 group-hover:brightness-100 transition-all duration-150"
                   />
-                  <span className="font-semibold absolute z-[5] bottom-2 left-2">
+                  <span className="font-semibold line-clamp-2 absolute z-[5] bottom-2 left-2">
                     {tournament_names}
                   </span>
                 </Link>
