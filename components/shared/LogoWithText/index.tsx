@@ -1,4 +1,4 @@
-import React, { SVGAttributes } from 'react';
+import { SVGAttributes } from 'react';
 
 function LogoWithText(props: SVGAttributes<SVGElement>) {
   return (

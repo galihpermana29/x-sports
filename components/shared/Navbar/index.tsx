@@ -4,7 +4,6 @@ import GET from '@/api/get';
 import ArrowDownIcon from '@/components/icons/ArrowDownIcon';
 import GameIcon from '@/components/icons/GameIcon';
 import HomeIcon from '@/components/icons/HomeIcon';
-import { MenuIcon } from '@/components/icons/MenuIcon';
 import NewsIcon from '@/components/icons/NewsIcon';
 import ReceiptIcon from '@/components/icons/ReceiptIcon';
 import ThreadsIcon from '@/components/icons/ThreadsIcon';
@@ -13,9 +12,10 @@ import type { GamesData } from '@/utils/types';
 import { Menu, Transition } from '@headlessui/react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import LogoWithText from '../LogoWithText';
-import { usePathname } from 'next/navigation';
+import MobileMenuButton from '../MobileMenuButton';
 
 function Navbar() {
   const [games, setGames] = useState<GamesData>();
@@ -78,15 +78,15 @@ function Navbar() {
                       <div className="p-2">
                         <p className="font-medium">List of Games</p>
                       </div>
-                      <div className="grid grid-cols-5 w-96 divide-xport-gray-primary">
+                      <div className="flex flex-wrap w-96 divide-xport-gray-primary">
                         {games?.data?.map(({ game_names, id, game_icons }) => {
                           return (
                             <Menu.Item key={id}>
                               {() => (
                                 <Link
                                   href={`/game?game_id=${id}`}
-                                  className="p-5 w-26 h-full cursor-pointer hover:bg-xport-black-light transition-all duration-150 flex flex-col gap-3 justify-start items-center">
-                                  <div className="relative w-10 h-10 bg-xport-black-light rounded-full overflow-hidden">
+                                  className="p-5 basis-1/4 w-full aspect-square cursor-pointer hover:bg-xport-black-light transition-all duration-150 flex flex-col gap-3 justify-start items-center">
+                                  <div className="relative w-10 h-10 bg-xport-black-light">
                                     <Image
                                       src={game_icons}
                                       alt={`${game_names} logo`}
@@ -94,7 +94,7 @@ function Navbar() {
                                       sizes="100vh"
                                     />
                                   </div>
-                                  <span className="text-xs text-center font-semibold text-white">
+                                  <span className="text-xs line-clamp-1 text-center font-semibold text-white">
                                     {game_names}{' '}
                                   </span>
                                 </Link>
@@ -111,7 +111,7 @@ function Navbar() {
           </li>
           <li>
             <Link
-              href={'/'}
+              href={'/news'}
               className="group flex items-center gap-3 font-semibold hover:text-xport-gray-primary transition-all duration-150">
               <NewsIcon className="w-6 h-6 fill-xport-light group-hover:fill-xport-gray-primary transition-all duration-150" />
               <span>News</span>
@@ -119,7 +119,7 @@ function Navbar() {
           </li>
           <li>
             <Link
-              href={'/'}
+              href={'/threads'}
               className="group flex items-center gap-3 font-semibold hover:text-xport-gray-primary transition-all duration-150">
               <ThreadsIcon className="w-6 h-6 fill-xport-light group-hover:fill-xport-gray-primary transition-all duration-150" />
               <span>Threads</span>
@@ -127,7 +127,7 @@ function Navbar() {
           </li>
           <li>
             <Link
-              href={'/'}
+              href={'/bets'}
               className="group flex items-center gap-3 font-semibold hover:text-xport-gray-primary transition-all duration-150">
               <ReceiptIcon className="w-6 h-6 fill-xport-light group-hover:fill-xport-gray-primary transition-all duration-150" />
               <span>Your Bet</span>
@@ -140,9 +140,7 @@ function Navbar() {
           <span>Connect wallet</span>
         </button>
 
-        <button className="flex lg:hidden">
-          <MenuIcon className="w-10 h-10" />
-        </button>
+        <MobileMenuButton />
       </div>
     </nav>
   );
