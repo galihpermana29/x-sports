@@ -11,14 +11,22 @@ import {
   Select,
   InputNumber,
   DatePicker,
+  Row,
+  TimePicker,
 } from 'antd';
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 
 import dayjs from 'dayjs';
+import { useAuth } from '@/context/Web3AuthContext';
+
+import contractAbi from '@/utils/web3/ABI.json';
+import { ethers } from 'ethers';
+import { contractAddress } from '@/utils/web3/address';
 
 export default function Ongoing() {
   const [form] = Form.useForm();
+  const { ethersProvider } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [datas, setDatas] = useState<MatchObjectI[]>();
   const [loading, setLoading] = useState<boolean>(false);
@@ -31,9 +39,41 @@ export default function Ongoing() {
     form.validateFields().then(async () => {
       const value = form.getFieldsValue();
       try {
-        const { date } = value;
-        const payload = { ...value, date: dayjs(date).format('DD MMMM YYYY') };
-        await CmsAPI.createMatch(payload);
+        const { date, time } = value;
+        const formattedTime = dayjs(time).format('HH:mm:ss');
+        const formattedDate = dayjs(date).format('YYYY-MM-DD');
+
+        const payload = {
+          ...value,
+          date: formattedDate + ' ' + formattedTime + ' ' + '+07:00',
+        };
+        const { team_a_id, team_a_odds, team_b_id, team_b_odds } = payload;
+
+        const { data: matchId } = await CmsAPI.createMatch(payload);
+
+        try {
+          const signer = await ethersProvider.getSigner();
+          const contracts = new ethers.Contract(
+            contractAddress,
+            contractAbi,
+            signer
+          );
+
+          const transaction = await contracts.createMatch(
+            BigInt(matchId),
+            team_a_id.toString(),
+            team_b_id.toString(),
+            team_a_odds,
+            team_b_odds
+          );
+
+          await transaction.wait();
+          message.success(`Transaction successful: ${transaction.hash}`);
+        } catch (error) {
+          console.log(error, 'err');
+          handleDeleteMatch(matchId);
+        }
+
         getAllMatch();
         setIsModalOpen(false);
         form.resetFields();
@@ -45,10 +85,45 @@ export default function Ongoing() {
         const err = responseData
           ? responseData?.errors[0]
           : 'Ouch, an error happen!';
-
         message.error(err);
       }
     });
+  };
+
+  const handleDeleteMatch = async (id: number) => {
+    try {
+      await CmsAPI.deleteMatch(id);
+      message.success('Match updated');
+      getAllMatch();
+    } catch (error) {
+      const axiosError = error as AxiosError; // Cast error to AxiosError
+      const responseData = axiosError.response?.data as
+        | { errors: string[] }
+        | undefined;
+      const err = responseData
+        ? responseData?.errors[0]
+        : 'Ouch, an error happen!';
+      console.log(error, responseData, 'error');
+      message.error(err);
+    }
+  };
+
+  const updateStatus = async (id: number, status: string) => {
+    try {
+      await CmsAPI.updateMatch({ status }, id);
+      message.success('Match deleted');
+      getAllMatch();
+    } catch (error) {
+      const axiosError = error as AxiosError; // Cast error to AxiosError
+      const responseData = axiosError.response?.data as
+        | { errors: string[] }
+        | undefined;
+      const err = responseData
+        ? responseData?.errors[0]
+        : 'Ouch, an error happen!';
+      console.log(error, responseData, 'error');
+      message.error(err);
+    }
   };
 
   const columns = [
@@ -68,6 +143,11 @@ export default function Ongoing() {
       key: 'game_names',
     },
     {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+    },
+    {
       title: 'Team A',
       dataIndex: 'team_a_names',
       key: 'team_a_names',
@@ -84,7 +164,7 @@ export default function Ongoing() {
     },
 
     {
-      title: ' B Odds',
+      title: 'B Odds',
       dataIndex: 'team_b_odds',
       key: 'team_b_odds',
     },
@@ -92,6 +172,11 @@ export default function Ongoing() {
       title: 'Date',
       dataIndex: 'date',
       key: 'date',
+      render: (date: string) => (
+        <div className="max-w-[150px]">
+          {dayjs(date).format('YYYY-MM-DD HH:mm:ss')}
+        </div>
+      ),
     },
     {
       title: 'Match Link',
@@ -106,7 +191,26 @@ export default function Ongoing() {
       title: 'Action',
       dataIndex: '',
       key: 'action',
-      render: () => <Button>End Match</Button>,
+      render: (data: MatchObjectI) => (
+        <Row justify={'center'} style={{ display: 'flex', gap: '10px' }}>
+          <Button type="primary" style={{ background: 'red' }}>
+            End
+          </Button>
+          {data.status === 'upcoming' && (
+            <Button
+              onClick={() => updateStatus(data.id, 'ongoing')}
+              style={{ background: 'blue' }}
+              type="primary">
+              Ongoing
+            </Button>
+          )}
+          <Button
+            style={{ background: 'grey', color: 'white' }}
+            onClick={() => handleDeleteMatch(data.id)}>
+            Delete
+          </Button>
+        </Row>
+      ),
     },
   ];
 
@@ -201,7 +305,18 @@ export default function Ongoing() {
             label="Date"
             name={'date'}
             className="mb-[10px]">
-            <DatePicker placeholder="date match" className="w-full" />
+            <DatePicker placeholder="Date match" className="w-full" />
+          </Form.Item>
+          <Form.Item
+            rules={[{ required: true, message: 'team_a_odds is required' }]}
+            label="Time"
+            name={'time'}
+            className="mb-[10px]">
+            <TimePicker
+              placeholder="Time match"
+              format="HH:mm:ss"
+              className="w-full"
+            />
           </Form.Item>
           <Form.Item
             rules={[

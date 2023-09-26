@@ -49,16 +49,17 @@ export interface TeamsPayloadI {
 }
 
 export interface MatchPayloadI {
-  tournament_names: string;
-  game_id: number;
-  team_a_id: number;
-  team_a_odds: number;
-  team_b_id: number;
-  team_b_odds: number;
-  date: string;
-  match_link: string;
+  tournament_names?: string;
+  game_id?: number;
+  team_a_id?: number;
+  team_a_odds?: number;
+  team_b_id?: number;
+  team_b_odds?: number;
+  date?: string;
+  match_link?: string;
   status?: string;
   winner?: string;
+  blockchain_id?: number;
 }
 
 export interface MatchObjectI {

@@ -27,6 +27,11 @@ async function getMatches(): Promise<MatchResponseI> {
   return data;
 }
 
+async function deleteMatch(id: number): Promise<MatchResponseI> {
+  const { data } = await cmsApi.delete<MatchResponseI>(`/matchs/${id}`);
+  return data;
+}
+
 async function getCompletedMatches(): Promise<MatchResponseI> {
   const { data } = await cmsApi.get<MatchResponseI>(`/matchs?status=completed`);
   return data;
@@ -118,6 +123,7 @@ const CmsAPI = {
   updateTeams,
   updateGames,
   getCompletedMatches,
+  deleteMatch,
 };
 
 export default CmsAPI;

@@ -15,11 +15,18 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import LogoWithText from '../LogoWithText';
 import MobileMenuButton from '../MobileMenuButton';
+import { useAuth } from '@/context/Web3AuthContext';
 
 function Navbar() {
   const [games, setGames] = useState<GamesData>();
 
   const path = usePathname();
+  const {
+    walletAddress,
+    isConnected,
+    connectWallet,
+    addBitTorrentChainToMetaMask,
+  } = useAuth();
 
   useEffect(() => {
     const getAllGames = async () => {
@@ -28,6 +35,10 @@ function Navbar() {
     };
 
     getAllGames();
+  }, []);
+
+  useEffect(() => {
+    connectWallet();
   }, []);
 
   return (
@@ -170,10 +181,28 @@ function Navbar() {
           </li>
         </ul>
 
-        <button className="hidden lg:flex items-center gap-3 px-5 py-2 rounded-[15px] font-semibold bg-gradient-to-r from-xport-orange-light text-white via-xport-orange-primary to-xport-orange-primary hover:scale-105 transition-all duration-150 active:translate-y-1">
-          <WalletIcon className="w-6 h-6 fill-white" />
-          <span>Connect wallet</span>
-        </button>
+        {walletAddress ? (
+          <div>
+            {isConnected ? (
+              <div
+                onClick={connectWallet}
+                className="hidden lg:flex items-center gap-3 px-5 py-2 rounded-[15px] font-semibold bg-gradient-to-r from-xport-orange-light text-white via-xport-orange-primary to-xport-orange-primary hover:scale-105 transition-all duration-150 active:translate-y-1">
+                Connected to BitTorrent
+              </div>
+            ) : (
+              <div
+                className="hidden lg:flex items-center gap-3 px-5 py-2 rounded-[15px] font-semibold bg-gradient-to-r from-xport-orange-light text-white via-xport-orange-primary to-xport-orange-primary hover:scale-105 transition-all duration-150 active:translate-y-1"
+                onClick={addBitTorrentChainToMetaMask}>
+                Add BitTorrent Chain to MetaMask
+              </div>
+            )}
+          </div>
+        ) : (
+          <button className="hidden lg:flex items-center gap-3 px-5 py-2 rounded-[15px] font-semibold bg-gradient-to-r from-xport-orange-light text-white via-xport-orange-primary to-xport-orange-primary hover:scale-105 transition-all duration-150 active:translate-y-1">
+            <WalletIcon className="w-6 h-6 fill-white" />
+            <span>Connect wallet</span>
+          </button>
+        )}
 
         <MobileMenuButton />
       </div>
