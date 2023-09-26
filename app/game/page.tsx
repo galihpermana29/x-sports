@@ -111,7 +111,7 @@ function GamePage() {
           </div>
         </Listbox>
         <Link
-          href={`/game/${currentId}`}
+          href={`/game/stream-list/${currentId}`}
           className="font-semibold flex items-center">
           <h2>
             <span className="text-xport-orange-primary">
