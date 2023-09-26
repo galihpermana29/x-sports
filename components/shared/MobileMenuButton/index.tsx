@@ -2,7 +2,6 @@ import GameIcon from '@/components/icons/GameIcon';
 import HomeIcon from '@/components/icons/HomeIcon';
 import { MenuIcon } from '@/components/icons/MenuIcon';
 import NewsIcon from '@/components/icons/NewsIcon';
-import ReceiptIcon from '@/components/icons/ReceiptIcon';
 import ThreadsIcon from '@/components/icons/ThreadsIcon';
 import WalletIcon from '@/components/icons/WalletIcon';
 import { Menu, Transition } from '@headlessui/react';
@@ -72,18 +71,6 @@ function MobileMenuButton() {
                   } group flex items-center w-full gap-3 font-semibold hover:text-xport-gray-primary transition-all duration-150 py-2 px-3`}>
                   <ThreadsIcon className="w-6 h-6 fill-xport-light group-hover:fill-xport-gray-primary transition-all duration-150" />
                   <span>Threads</span>
-                </Link>
-              )}
-            </Menu.Item>
-            <Menu.Item>
-              {({ active }) => (
-                <Link
-                  href={'/bets'}
-                  className={`${
-                    active ? ' text-xport-orange-primary' : 'text-xport-light'
-                  } group flex items-center w-full gap-3 font-semibold hover:text-xport-gray-primary transition-all duration-150 py-2 px-3`}>
-                  <ReceiptIcon className="w-6 h-6 fill-xport-light group-hover:fill-xport-gray-primary transition-all duration-150" />
-                  <span>Your Bet</span>
                 </Link>
               )}
             </Menu.Item>

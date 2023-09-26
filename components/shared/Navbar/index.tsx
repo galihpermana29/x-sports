@@ -5,7 +5,6 @@ import ArrowDownIcon from '@/components/icons/ArrowDownIcon';
 import GameIcon from '@/components/icons/GameIcon';
 import HomeIcon from '@/components/icons/HomeIcon';
 import NewsIcon from '@/components/icons/NewsIcon';
-import ReceiptIcon from '@/components/icons/ReceiptIcon';
 import ThreadsIcon from '@/components/icons/ThreadsIcon';
 import WalletIcon from '@/components/icons/WalletIcon';
 import type { GamesData } from '@/utils/types';
@@ -41,12 +40,22 @@ function Navbar() {
           <LogoWithText className="h-16" />
         </Link>
 
-        <ul className="hidden lg:flex items-center gap-10 text-xport-light">
+        <ul className="hidden lg:flex items-center gap-10">
           <li>
             <Link
               href={'/'}
-              className="group flex items-center gap-3 font-semibold hover:text-xport-gray-primary transition-all duration-150">
-              <HomeIcon className="w-6 h-6 fill-xport-light group-hover:fill-xport-gray-primary transition-all duration-150" />
+              className={`group flex items-center gap-3 font-semibold transition-all duration-150 ${
+                path === '/'
+                  ? 'text-xport-orange-primary hover:text-xport-orange-light'
+                  : 'text-xport-light hover:text-xport-gray-primary'
+              }`}>
+              <HomeIcon
+                className={`w-6 h-6 transition-all duration-150 ${
+                  path === '/'
+                    ? 'fill-xport-orange-primary group-hover:fill-xport-orange-light'
+                    : 'fill-xport-light group-hover:fill-xport-gray-primary'
+                }`}
+              />
               <span>Home</span>
             </Link>
           </li>
@@ -55,12 +64,26 @@ function Navbar() {
               {({ open }) => (
                 <>
                   <Menu.Button
-                    className={
-                      'group flex items-center gap-3 font-semibold hover:text-xport-gray-primary text-xport-light'
-                    }>
-                    <GameIcon className="w-6 h-6 fill-xport-light group-hover:fill-xport-gray-primary transition-all duration-150" />
+                    className={`group flex items-center gap-3 font-semibold transition-all duration-150 ${
+                      path.includes('/game')
+                        ? 'text-xport-orange-primary hover:text-xport-orange-light'
+                        : 'text-xport-light hover:text-xport-gray-primary'
+                    }`}>
+                    <GameIcon
+                      className={`w-6 h-6 transition-all duration-150 ${
+                        path.includes('/game')
+                          ? 'fill-xport-orange-primary group-hover:fill-xport-orange-light'
+                          : 'fill-xport-light group-hover:fill-xport-gray-primary'
+                      }`}
+                    />
                     <span>Games</span>
-                    <ArrowDownIcon className="w-4 h-4 -ml-2 fill-xport-light group-hover:fill-xport-gray-primary" />
+                    <ArrowDownIcon
+                      className={`w-4 h-4 -ml-2 ${
+                        path.includes('/game')
+                          ? 'fill-xport-orange-primary group-hover:fill-xport-orange-light'
+                          : 'fill-xport-light group-hover:fill-xport-gray-primary'
+                      }`}
+                    />
                   </Menu.Button>
 
                   <Transition
@@ -112,25 +135,37 @@ function Navbar() {
           <li>
             <Link
               href={'/news'}
-              className="group flex items-center gap-3 font-semibold hover:text-xport-gray-primary transition-all duration-150">
-              <NewsIcon className="w-6 h-6 fill-xport-light group-hover:fill-xport-gray-primary transition-all duration-150" />
+              className={`group flex items-center gap-3 font-semibold transition-all duration-150 ${
+                path.includes('/news')
+                  ? 'text-xport-orange-primary hover:text-xport-orange-light'
+                  : 'text-xport-light hover:text-xport-gray-primary'
+              }`}>
+              <NewsIcon
+                className={`w-6 h-6 transition-all duration-150 ${
+                  path.includes('/news')
+                    ? 'fill-xport-orange-primary group-hover:fill-xport-orange-light'
+                    : 'fill-xport-light group-hover:fill-xport-gray-primary'
+                }`}
+              />
               <span>News</span>
             </Link>
           </li>
           <li>
             <Link
               href={'/threads'}
-              className="group flex items-center gap-3 font-semibold hover:text-xport-gray-primary transition-all duration-150">
-              <ThreadsIcon className="w-6 h-6 fill-xport-light group-hover:fill-xport-gray-primary transition-all duration-150" />
+              className={`group flex items-center gap-3 font-semibold transition-all duration-150 ${
+                path.includes('/threads')
+                  ? 'text-xport-orange-primary hover:text-xport-orange-light'
+                  : 'text-xport-light hover:text-xport-gray-primary'
+              }`}>
+              <ThreadsIcon
+                className={`w-6 h-6 transition-all duration-150 ${
+                  path.includes('/threads')
+                    ? 'fill-xport-orange-primary group-hover:fill-xport-orange-light'
+                    : 'fill-xport-light group-hover:fill-xport-gray-primary'
+                }`}
+              />
               <span>Threads</span>
-            </Link>
-          </li>
-          <li>
-            <Link
-              href={'/bets'}
-              className="group flex items-center gap-3 font-semibold hover:text-xport-gray-primary transition-all duration-150">
-              <ReceiptIcon className="w-6 h-6 fill-xport-light group-hover:fill-xport-gray-primary transition-all duration-150" />
-              <span>Your Bet</span>
             </Link>
           </li>
         </ul>

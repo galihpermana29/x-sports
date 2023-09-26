@@ -5,37 +5,34 @@ import GET from '@/api/get';
 import ArrowRightIcon from '@/components/icons/ArrowRightIcon';
 import BetSlipTab from '@/components/shared/BetSlipTab';
 import { parseVideoId } from '@/utils/functions';
-import { MatchDetail, type MatchDetailData } from '@/utils/types';
+import { MatchDetail } from '@/utils/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 function Livestream() {
-  const [match, setMatch] = useState<MatchDetailData>();
+  const [match, setMatch] = useState<MatchDetail>();
   const [filteredMatches, setFilteredMatches] = useState<MatchDetail[]>();
   const [currentOdds, setCurrentOdds] = useState<number | null>(null);
   const [currentTeam, setCurrentTeam] = useState<string | null>(null);
+  const [currentTeamIcon, setcurrentTeamIcon] = useState<string | null>(null);
 
   const path = usePathname();
   const matchId = parseInt(path.split('/').pop());
 
   const getMatchDetail = async () => {
-    const res = await GET.getMatchById(matchId);
-    setMatch(res);
+    const { data } = await GET.getMatchById(matchId);
+    setMatch(data);
   };
   const getAllMatch = async () => {
-    const res = await GET.getAllMatch();
-    console.log(res);
-    const ongoing = res.data.filter((data, index) => {
-      return (
-        data.id !== match?.data.id &&
-        data.status === 'ongoing' &&
-        data.game_names === match?.data.game_names &&
-        index < 3
-      );
+    const { data } = await GET.getMatchByMultipleFilters([
+      `status=ongoing`,
+      `game_id=${match?.game_id ?? 4}`,
+    ]);
+    const ongoing = data.filter((data) => {
+      return data.id !== match?.id;
     });
-
     setFilteredMatches(ongoing);
   };
 
@@ -59,17 +56,17 @@ function Livestream() {
           <iframe
             className="w-full h-full"
             src={`https://www.youtube.com/embed/${parseVideoId(
-              match?.data.match_link
+              match?.match_link
             )}?si=a4q6Ta7KnMnohmVj`}
             title="YouTube video player"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
         </div>
         <div>
           <h1 className="font-bold text-xl md:text-2xl">
-            {match?.data.tournament_names}
+            {match?.tournament_names}
           </h1>
           <p className="font-semibold text-lg md:text-xl text-xport-light">
-            {match?.data.game_names}
+            {match?.game_names}
           </p>
         </div>
         <div className="bg-xport-black-light w-full flex flex-col sm:flex-row gap-2 text-xs md:text-base">
@@ -78,23 +75,24 @@ function Livestream() {
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 relative">
                   <Image
-                    src={match?.data.team_a_icons}
-                    alt={`${match?.data.team_a_names} logo`}
+                    src={match?.team_a_icons}
+                    alt={`${match?.team_a_names} logo`}
                     fill
                     sizes="100vw"
                     className="object-cover"
                   />
                 </div>
-                <h3 className="font-medium">{match?.data.team_a_names}</h3>
+                <h3 className="font-medium">{match?.team_a_names}</h3>
               </div>
               <p className="font-bold text-xport-orange-light">
-                {match?.data.team_a_odds}
+                {match?.team_a_odds}
               </p>
             </div>
             <button
               onClick={() => {
-                setCurrentOdds(match?.data.team_a_odds);
-                setCurrentTeam(match?.data.team_a_names);
+                setCurrentOdds(match?.team_a_odds);
+                setCurrentTeam(match?.team_a_names);
+                setcurrentTeamIcon(match?.team_a_icons);
               }}
               className="flex basis-[30%] cursor-pointer hover:underline justify-center items-center font-medium">
               Bet Now
@@ -106,24 +104,23 @@ function Livestream() {
           <div className="bg-xport-orange-primary basis-[45%] rounded-l-full flex">
             <button
               onClick={() => {
-                setCurrentOdds(match?.data.team_b_odds);
-                setCurrentTeam(match?.data.team_b_names);
+                setCurrentOdds(match?.team_b_odds);
+                setCurrentTeam(match?.team_b_names);
+                setcurrentTeamIcon(match?.team_b_icons);
               }}
               className="flex cursor-pointer hover:underline basis-[30%] justify-center items-center font-medium">
               Bet Now
             </button>
             <div className="bg-xport-gray-alternate basis-[70%] px-5 py-3 rounded-l-full flex justify-between items-center">
               <p className="font-bold text-xport-orange-light">
-                {match?.data.team_b_odds}
+                {match?.team_b_odds}
               </p>
               <div className="flex items-center gap-3">
-                <h3 className="font-medium text-end">
-                  {match?.data.team_b_names}
-                </h3>
+                <h3 className="font-medium text-end">{match?.team_b_names}</h3>
                 <div className="h-10 w-10 relative">
                   <Image
-                    src={match?.data.team_b_icons}
-                    alt={`${match?.data.team_b_names} logo`}
+                    src={match?.team_b_icons}
+                    alt={`${match?.team_b_names} logo`}
                     fill
                     sizes="100vw"
                     className="object-cover"
@@ -138,7 +135,7 @@ function Livestream() {
             href={'/game'}
             className="group font-semibold flex gap-1 items-center">
             <span className="text-xport-orange-primary">
-              {match?.data.game_names}
+              {match?.game_names}
             </span>
             <span>Ongoing Livestream</span>
             <span className="group-hover:translate-x-1 transition-all duration-150">
@@ -151,34 +148,36 @@ function Livestream() {
                 No Ongoing Matches
               </div>
             )}
-            {filteredMatches?.map(({ id, tournament_names }) => {
+            {filteredMatches?.map(({ id, tournament_names }, index) => {
               return (
-                <Link
-                  href={`/livestream/${id}`}
-                  key={id}
-                  className="group relative overflow-hidden w-full aspect-video bg-xport-black-light rounded">
-                  <Image
-                    src={`https://img.youtube.com/vi/${parseVideoId(
-                      match?.data.match_link
-                    )}/sddefault.jpg`}
-                    alt={tournament_names}
-                    fill
-                    className="object-cover brightness-75 group-hover:brightness-100 transition-all duration-150"
-                  />
-                  <span className="font-semibold line-clamp-2 absolute z-[5] bottom-2 left-2">
-                    {tournament_names}
-                  </span>
-                </Link>
+                index < 3 && (
+                  <Link
+                    href={`/livestream/${id}`}
+                    key={id}
+                    className="group relative overflow-hidden w-full aspect-video bg-xport-black-light rounded">
+                    <Image
+                      src={`https://img.youtube.com/vi/${parseVideoId(
+                        match?.match_link
+                      )}/sddefault.jpg`}
+                      alt={tournament_names}
+                      fill
+                      className="object-cover brightness-75 group-hover:brightness-100 transition-all duration-150"
+                    />
+                    <span className="font-semibold line-clamp-2 absolute z-[5] bottom-2 left-2">
+                      {tournament_names}
+                    </span>
+                  </Link>
+                )
               );
             })}
           </div>
         </div>
       </section>
       <BetSlipTab
-        gameIcon={match?.data.game_icons}
-        chosenTeam={currentTeam}
+        gameIcon={match?.game_icons}
+        chosenTeam={{ icon: currentTeamIcon, name: currentTeam }}
         odds={currentOdds}
-        teams={[match?.data.team_a_names, match?.data.team_b_names]}
+        teams={[match?.team_a_names, match?.team_b_names]}
       />
     </main>
   );

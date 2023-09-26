@@ -1,5 +1,3 @@
-'use client';
-
 import GET from '@/api/get';
 import ArrowRightIcon from '@/components/icons/ArrowRightIcon';
 import GameIcon from '@/components/icons/GameIcon';
@@ -7,24 +5,20 @@ import NewsCard from '@/components/shared/NewsCard';
 import RectangleSkeleton from '@/components/shared/RectangleSkeleton';
 import ThreadsCard from '@/components/shared/ThreadsCard';
 import { parseVideoId } from '@/utils/functions';
-import { MatchDetail, News, Threads } from '@/utils/types';
+import { News } from '@/utils/types';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 
-export default function Home() {
-  const [livestreams, setOngoingLivestreams] = useState<MatchDetail[]>();
-  const [news, setNews] = useState<News[]>();
-  const [threads, setThreads] = useState<Threads[]>();
+export default async function Home() {
+  const { data: spotlightList } = await GET.getMatchByStatus('upcoming');
+  const { data: news } = await GET.getNewsByGameId(1);
+  const { data: threads } = await GET.getAllThreads();
+  const { data: ongoingLivestreams } = await GET.getMatchByMultipleFilters([
+    'game_id=1',
+    'status=ongoing',
+  ]);
 
-  const ongoingLivestreams = livestreams?.filter(({ status }) => {
-    return status === 'ongoing';
-  });
-  const spotlight = livestreams?.find(({ status }) => {
-    return status === 'upcoming';
-  });
-
-  let firstHeadline, secondHeadline, thirdHeadline;
+  let firstHeadline, secondHeadline, thirdHeadline: News;
 
   if (news) {
     firstHeadline = news[0];
@@ -32,37 +26,7 @@ export default function Home() {
     thirdHeadline = news[2];
   }
 
-  const getMatches = async () => {
-    const res = await GET.getAllMatch();
-    console.log(res);
-    const ongoing = res.data.filter(({ game_id }, index) => {
-      return game_id === 1 && index < 5;
-    });
-
-    setOngoingLivestreams(ongoing);
-  };
-
-  const getNews = async () => {
-    const res = await GET.getAllNews();
-    const filteredNews = res.data.filter(({ game_id }, index) => {
-      return game_id === 1 && index < 5;
-    });
-    setNews(filteredNews);
-  };
-
-  const getThreads = async () => {
-    const { data } = await GET.getAllThreads();
-    const filteredThreads = data.filter(({ game_id }, index) => {
-      return game_id === 1 && index < 4;
-    });
-    setThreads(filteredThreads);
-  };
-
-  useEffect(() => {
-    getMatches();
-    getNews();
-    getThreads();
-  }, []);
+  const spotlight = spotlightList[0] ?? null;
 
   return (
     <main className="flex flex-col gap-10 max-w-screen-xl mx-auto px-5 py-10 md:px-10">
@@ -195,7 +159,7 @@ export default function Home() {
           </h2>
         </Link>
         <div className="flex flex-col md:flex-row gap-4">
-          {news?.length > 0 && (
+          {news?.length >= 3 && (
             <div className="flex gap-4 w-full">
               <div className="md:basis-[35%] flex flex-col gap-4">
                 <Link
@@ -274,11 +238,14 @@ export default function Home() {
               No Recent News
             </span>
           )}
-          {news?.map((item, index) => {
-            return (
-              ![0, 1, 2].includes(index) && <NewsCard key={item.id} {...item} />
-            );
-          })}
+          {news
+            ?.filter((item, index) => {
+              if (news?.length < 3) return;
+              return ![0, 1, 2].includes(index);
+            })
+            .map((item, index) => {
+              return index < 2 && <NewsCard key={item.id} {...item} />;
+            })}
         </div>
       </section>
       <section>

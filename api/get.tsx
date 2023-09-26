@@ -38,8 +38,22 @@ async function getMatchByGameId(id: number): Promise<AllMatchData> {
   return data;
 }
 
+async function getMatchByMultipleFilters(
+  filter: string[]
+): Promise<AllMatchData> {
+  const { data } = await clientApi.get<AllMatchData>(
+    `/matchs?${filter.join('&')}`
+  );
+  return data;
+}
+
 async function getNewsById(id: number): Promise<NewsDetailData> {
   const { data } = await clientApi.get<NewsDetailData>(`/news/${id}`);
+  return data;
+}
+
+async function getNewsByGameId(id: number): Promise<NewsData> {
+  const { data } = await clientApi.get<NewsData>(`/news?game_id=${id}`);
   return data;
 }
 
@@ -63,8 +77,10 @@ const GET = {
   getMatchById,
   getAllMatch,
   getMatchByStatus,
+  getMatchByMultipleFilters,
   getAllNews,
   getMatchByGameId,
+  getNewsByGameId,
   getNewsById,
   getAllThreads,
   getThreadById,
