@@ -7,13 +7,16 @@ import {
   useState,
 } from 'react';
 import Web3 from 'web3';
+import { ethers } from 'ethers';
 
 let web3: Web3 | undefined;
 let ethereum: any;
+let ethersProvider: any;
 
 if (typeof window !== 'undefined') {
   ethereum = (window as any).ethereum;
   web3 = new Web3(ethereum);
+  ethersProvider = new ethers.providers.Web3Provider(ethereum);
 }
 
 interface AuthContextType {
@@ -22,6 +25,7 @@ interface AuthContextType {
   connectWallet: () => Promise<void>;
   addBitTorrentChainToMetaMask: () => Promise<void>;
   provider: Web3 | undefined;
+  ethersProvider: any;
 }
 
 type MyComponentProps = {
@@ -101,6 +105,7 @@ export const AuthProvider: React.FC<MyComponentProps> = ({ children }) => {
         connectWallet,
         addBitTorrentChainToMetaMask,
         provider: web3,
+        ethersProvider,
       }}>
       {children}
     </AuthContext.Provider>

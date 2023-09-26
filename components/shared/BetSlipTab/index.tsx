@@ -5,7 +5,7 @@ import LogoWithText from '../LogoWithText';
 import ArrowDownIcon from '@/components/icons/ArrowDownIcon';
 import XIcon from '@/components/icons/XIcon';
 import { Listbox, Transition } from '@headlessui/react';
-import { useState, Fragment } from 'react';
+import { useState, Fragment, SetStateAction } from 'react';
 import Image from 'next/image';
 
 const bids = [5, 10, 20, 30, 50, 100];
@@ -18,9 +18,16 @@ type BetData = {
     name: string;
     icon: string;
   };
+  onClickBet: React.Dispatch<SetStateAction<any>>;
 };
 
-function BetSlipTab({ odds, teams, chosenTeam, gameIcon }: BetData) {
+function BetSlipTab({
+  odds,
+  teams,
+  chosenTeam,
+  gameIcon,
+  onClickBet,
+}: BetData) {
   const [selectedPayout, setSelectedPayout] = useState<number>(bids[0]);
 
   return (
@@ -139,7 +146,9 @@ function BetSlipTab({ odds, teams, chosenTeam, gameIcon }: BetData) {
             <span>{selectedPayout * odds}K BTTC</span>
           </div>
         </div>
-        <button className="text-center w-1/3 h-full cursor-pointer hover:underline px-3">
+        <button
+          onClick={() => onClickBet(selectedPayout)}
+          className="text-center w-1/3 h-full cursor-pointer hover:underline px-3">
           PLACE BETS
         </button>
       </div>

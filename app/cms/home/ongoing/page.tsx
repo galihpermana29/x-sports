@@ -21,10 +21,12 @@ import dayjs from 'dayjs';
 import { useAuth } from '@/context/Web3AuthContext';
 
 import contractAbi from '@/utils/web3/ABI.json';
+import { ethers } from 'ethers';
+import { contractAddress } from '@/utils/web3/address';
 
 export default function Ongoing() {
   const [form] = Form.useForm();
-  const { walletAddress, provider } = useAuth();
+  const { ethersProvider } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [datas, setDatas] = useState<MatchObjectI[]>();
   const [loading, setLoading] = useState<boolean>(false);
@@ -48,42 +50,27 @@ export default function Ongoing() {
         const { team_a_id, team_a_odds, team_b_id, team_b_odds } = payload;
 
         const { data: matchId } = await CmsAPI.createMatch(payload);
-        const contractAddress = '0x4c9f9D36f2F7E414948ae83E482102692cB88323';
 
         try {
-          const contract = new provider.eth.Contract(
+          const signer = await ethersProvider.getSigner();
+          const contracts = new ethers.Contract(
+            contractAddress,
             contractAbi,
-            contractAddress
+            signer
           );
 
-          const transactionObject = {
-            from: walletAddress, // Sender's address
-            to: contractAddress, // Smart contract's address
-            gas: 200000, // Gas limit (adjust as needed)
-            data: contract?.methods
-              ?.createMatch(
-                BigInt(matchId),
-                team_a_id.toString(),
-                team_b_id.toString(),
-                team_a_odds,
-                team_b_odds
-              )
-              .encodeABI(),
-          };
-          provider.eth
-            .sendTransaction(transactionObject)
-            .on('transactionHash', (hash: string) => {
-              message.success(`Successfully Create Hash TX: ${hash}`);
-            })
-            .on('receipt', () => {
-              message.success(`Successfully Created Match`);
-            })
-            .on('error', (error: Error) => {
-              handleDeleteMatch(matchId);
-              message.error('Error transaction');
-              console.log(error);
-            });
+          const transaction = await contracts.createMatch(
+            BigInt(matchId),
+            team_a_id.toString(),
+            team_b_id.toString(),
+            team_a_odds,
+            team_b_odds
+          );
+
+          await transaction.wait();
+          message.success(`Transaction successful: ${transaction.hash}`);
         } catch (error) {
+          console.log(error, 'err');
           handleDeleteMatch(matchId);
         }
 
@@ -106,6 +93,24 @@ export default function Ongoing() {
   const handleDeleteMatch = async (id: number) => {
     try {
       await CmsAPI.deleteMatch(id);
+      message.success('Match updated');
+      getAllMatch();
+    } catch (error) {
+      const axiosError = error as AxiosError; // Cast error to AxiosError
+      const responseData = axiosError.response?.data as
+        | { errors: string[] }
+        | undefined;
+      const err = responseData
+        ? responseData?.errors[0]
+        : 'Ouch, an error happen!';
+      console.log(error, responseData, 'error');
+      message.error(err);
+    }
+  };
+
+  const updateStatus = async (id: number, status: string) => {
+    try {
+      await CmsAPI.updateMatch({ status }, id);
       message.success('Match deleted');
       getAllMatch();
     } catch (error) {
@@ -138,6 +143,11 @@ export default function Ongoing() {
       key: 'game_names',
     },
     {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+    },
+    {
       title: 'Team A',
       dataIndex: 'team_a_names',
       key: 'team_a_names',
@@ -154,7 +164,7 @@ export default function Ongoing() {
     },
 
     {
-      title: ' B Odds',
+      title: 'B Odds',
       dataIndex: 'team_b_odds',
       key: 'team_b_odds',
     },
@@ -179,15 +189,25 @@ export default function Ongoing() {
 
     {
       title: 'Action',
-      dataIndex: 'id',
+      dataIndex: '',
       key: 'action',
-      render: (id: number) => (
-        <Row>
-          <Button>End Match</Button>
+      render: (data: MatchObjectI) => (
+        <Row justify={'center'} style={{ display: 'flex', gap: '10px' }}>
+          <Button type="primary" style={{ background: 'red' }}>
+            End
+          </Button>
+          {data.status === 'upcoming' && (
+            <Button
+              onClick={() => updateStatus(data.id, 'ongoing')}
+              style={{ background: 'blue' }}
+              type="primary">
+              Ongoing
+            </Button>
+          )}
           <Button
-            style={{ marginLeft: '10px' }}
-            onClick={() => handleDeleteMatch(id)}>
-            Delete Match
+            style={{ background: 'grey', color: 'white' }}
+            onClick={() => handleDeleteMatch(data.id)}>
+            Delete
           </Button>
         </Row>
       ),

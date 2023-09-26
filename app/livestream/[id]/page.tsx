@@ -4,12 +4,17 @@
 import GET from '@/api/get';
 import ArrowRightIcon from '@/components/icons/ArrowRightIcon';
 import BetSlipTab from '@/components/shared/BetSlipTab';
+import { useAuth } from '@/context/Web3AuthContext';
 import { parseVideoId } from '@/utils/functions';
 import { MatchDetail } from '@/utils/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { ethers } from 'ethers';
+import { contractAddress } from '@/utils/web3/address';
+import contractAbi from '@/utils/web3/ABI.json';
+import { message } from 'antd';
 
 function Livestream() {
   const [match, setMatch] = useState<MatchDetail>();
@@ -20,6 +25,7 @@ function Livestream() {
 
   const path = usePathname();
   const matchId = parseInt(path.split('/').pop());
+  const { ethersProvider } = useAuth();
 
   const getMatchDetail = async () => {
     const { data } = await GET.getMatchById(matchId);
@@ -34,6 +40,38 @@ function Livestream() {
       return data.id !== match?.id;
     });
     setFilteredMatches(ongoing);
+  };
+
+  const handleClickBet = async (payout: number) => {
+    if (currentTeam === null) return;
+    let valueOfTeam = 0;
+    if (currentTeam === match.team_a_names) valueOfTeam = 0;
+    else valueOfTeam = 1;
+
+    try {
+      const signer = await ethersProvider.getSigner();
+      const contracts = new ethers.Contract(
+        contractAddress,
+        contractAbi,
+        signer
+      );
+
+      const transaction = await contracts.placeBet(
+        BigInt(matchId),
+        payout * 1000,
+        valueOfTeam,
+        {
+          gasLimit: 30000,
+          // gasPrice: 25,
+        }
+      );
+
+      await transaction.wait();
+      message.success(`Transaction successful: ${transaction.hash}`);
+    } catch (error) {
+      message.error('Transaction Fail');
+      console.log(error, 'err');
+    }
   };
 
   useEffect(() => {
@@ -174,6 +212,7 @@ function Livestream() {
         </div>
       </section>
       <BetSlipTab
+        onClickBet={handleClickBet}
         gameIcon={match?.game_icons}
         chosenTeam={{ icon: currentTeamIcon, name: currentTeam }}
         odds={currentOdds}
