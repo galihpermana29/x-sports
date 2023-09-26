@@ -21,6 +21,7 @@ interface AuthContextType {
   isConnected: boolean;
   connectWallet: () => Promise<void>;
   addBitTorrentChainToMetaMask: () => Promise<void>;
+  provider: Web3 | undefined;
 }
 
 type MyComponentProps = {
@@ -99,6 +100,7 @@ export const AuthProvider: React.FC<MyComponentProps> = ({ children }) => {
         isConnected,
         connectWallet,
         addBitTorrentChainToMetaMask,
+        provider: web3,
       }}>
       {children}
     </AuthContext.Provider>

@@ -59,6 +59,7 @@ export interface MatchPayloadI {
   match_link: string;
   status?: string;
   winner?: string;
+  blockchain_id?: number;
 }
 
 export interface MatchObjectI {

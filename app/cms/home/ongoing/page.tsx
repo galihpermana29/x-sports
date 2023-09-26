@@ -11,14 +11,20 @@ import {
   Select,
   InputNumber,
   DatePicker,
+  Row,
+  TimePicker,
 } from 'antd';
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 
 import dayjs from 'dayjs';
+import { useAuth } from '@/context/Web3AuthContext';
+
+import contractAbi from '@/utils/web3/ABI.json';
 
 export default function Ongoing() {
   const [form] = Form.useForm();
+  const { walletAddress, provider } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [datas, setDatas] = useState<MatchObjectI[]>();
   const [loading, setLoading] = useState<boolean>(false);
@@ -31,9 +37,56 @@ export default function Ongoing() {
     form.validateFields().then(async () => {
       const value = form.getFieldsValue();
       try {
-        const { date } = value;
-        const payload = { ...value, date: dayjs(date).format('DD MMMM YYYY') };
-        await CmsAPI.createMatch(payload);
+        const { date, time } = value;
+        const formattedTime = dayjs(time).format('HH:mm:ss');
+        const formattedDate = dayjs(date).format('YYYY-MM-DD');
+
+        const payload = {
+          ...value,
+          date: formattedDate + ' ' + formattedTime + ' ' + '+07:00',
+        };
+        const { team_a_id, team_a_odds, team_b_id, team_b_odds } = payload;
+
+        const { data: matchId } = await CmsAPI.createMatch(payload);
+        const contractAddress = '0x4c9f9D36f2F7E414948ae83E482102692cB88323';
+
+        try {
+          const contract = new provider.eth.Contract(
+            contractAbi,
+            contractAddress
+          );
+
+          const transactionObject = {
+            from: walletAddress, // Sender's address
+            to: contractAddress, // Smart contract's address
+            gas: 200000, // Gas limit (adjust as needed)
+            data: contract?.methods
+              ?.createMatch(
+                BigInt(matchId),
+                team_a_id.toString(),
+                team_b_id.toString(),
+                team_a_odds,
+                team_b_odds
+              )
+              .encodeABI(),
+          };
+          provider.eth
+            .sendTransaction(transactionObject)
+            .on('transactionHash', (hash: string) => {
+              message.success(`Successfully Create Hash TX: ${hash}`);
+            })
+            .on('receipt', () => {
+              message.success(`Successfully Created Match`);
+            })
+            .on('error', (error: Error) => {
+              handleDeleteMatch(matchId);
+              message.error('Error transaction');
+              console.log(error);
+            });
+        } catch (error) {
+          handleDeleteMatch(matchId);
+        }
+
         getAllMatch();
         setIsModalOpen(false);
         form.resetFields();
@@ -45,10 +98,27 @@ export default function Ongoing() {
         const err = responseData
           ? responseData?.errors[0]
           : 'Ouch, an error happen!';
-
         message.error(err);
       }
     });
+  };
+
+  const handleDeleteMatch = async (id: number) => {
+    try {
+      await CmsAPI.deleteMatch(id);
+      message.success('Match deleted');
+      getAllMatch();
+    } catch (error) {
+      const axiosError = error as AxiosError; // Cast error to AxiosError
+      const responseData = axiosError.response?.data as
+        | { errors: string[] }
+        | undefined;
+      const err = responseData
+        ? responseData?.errors[0]
+        : 'Ouch, an error happen!';
+      console.log(error, responseData, 'error');
+      message.error(err);
+    }
   };
 
   const columns = [
@@ -92,6 +162,11 @@ export default function Ongoing() {
       title: 'Date',
       dataIndex: 'date',
       key: 'date',
+      render: (date: string) => (
+        <div className="max-w-[150px]">
+          {dayjs(date).format('YYYY-MM-DD HH:mm:ss')}
+        </div>
+      ),
     },
     {
       title: 'Match Link',
@@ -104,9 +179,18 @@ export default function Ongoing() {
 
     {
       title: 'Action',
-      dataIndex: '',
+      dataIndex: 'id',
       key: 'action',
-      render: () => <Button>End Match</Button>,
+      render: (id: number) => (
+        <Row>
+          <Button>End Match</Button>
+          <Button
+            style={{ marginLeft: '10px' }}
+            onClick={() => handleDeleteMatch(id)}>
+            Delete Match
+          </Button>
+        </Row>
+      ),
     },
   ];
 
@@ -201,7 +285,18 @@ export default function Ongoing() {
             label="Date"
             name={'date'}
             className="mb-[10px]">
-            <DatePicker placeholder="date match" className="w-full" />
+            <DatePicker placeholder="Date match" className="w-full" />
+          </Form.Item>
+          <Form.Item
+            rules={[{ required: true, message: 'team_a_odds is required' }]}
+            label="Time"
+            name={'time'}
+            className="mb-[10px]">
+            <TimePicker
+              placeholder="Time match"
+              format="HH:mm:ss"
+              className="w-full"
+            />
           </Form.Item>
           <Form.Item
             rules={[
