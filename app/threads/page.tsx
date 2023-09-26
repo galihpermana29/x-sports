@@ -1,26 +1,13 @@
-'use client';
-
 import GET from '@/api/get';
 import FireIcon from '@/components/icons/FIreIcon';
 import GameIcon from '@/components/icons/GameIcon';
 import ThreadsCard from '@/components/shared/ThreadsCard';
 import { shuffleArray } from '@/utils/functions';
-import { Threads } from '@/utils/types';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 
-function ThreadsPage() {
-  const [threads, setThreads] = useState<Threads[]>();
-
-  const getThreads = async () => {
-    const { data } = await GET.getAllThreads();
-    setThreads(data);
-  };
-
-  useEffect(() => {
-    getThreads();
-  }, []);
+async function ThreadsPage() {
+  const { data: threads } = await GET.getAllThreads();
 
   return (
     <main className="flex flex-col-reverse md:flex-row gap-10 max-w-screen-xl mx-auto px-5 py-10 md:px-10">
@@ -32,7 +19,7 @@ function ThreadsPage() {
       <aside className="basis-[40%] overflow-hidden lg:basis-[30%] w-full h-fit rounded-md bg-xport-black-light">
         <div className="flex px-5 pt-5 items-center gap-2 text-lg font-semibold">
           <FireIcon className="w-7 h-7 fill-xport-light" />
-          <h3>Hot News</h3>
+          <h3>Hot Threads</h3>
         </div>
         <div className="flex flex-col mt-5">
           {threads &&

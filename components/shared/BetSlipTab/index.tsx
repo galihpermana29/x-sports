@@ -14,7 +14,10 @@ type BetData = {
   odds: number;
   teams: string[];
   gameIcon: string;
-  chosenTeam: string;
+  chosenTeam: {
+    name: string;
+    icon: string;
+  };
 };
 
 function BetSlipTab({ odds, teams, chosenTeam, gameIcon }: BetData) {
@@ -31,7 +34,7 @@ function BetSlipTab({ odds, teams, chosenTeam, gameIcon }: BetData) {
               <XIcon className="w-3 h-3" />
             </span>
           </div>
-          <div className="bg-xport-gray-primary px-3 py-2 flex flex-col gap-2">
+          <div className="bg-xport-gray-primary px-3 py-2 flex flex-col gap-4">
             <div className="flex gap-2 items-center">
               <div className="aspect-square relative h-8 rounded-full bg-xport-gray-alternate">
                 <Image
@@ -49,8 +52,15 @@ function BetSlipTab({ odds, teams, chosenTeam, gameIcon }: BetData) {
             {chosenTeam && odds && (
               <div className="flex justify-between items-center font-semibold">
                 <div className="flex items-center gap-2">
-                  <div className="h-8 aspect-square rounded-full bg-xport-gray-alternate"></div>
-                  <span>{chosenTeam}</span>
+                  <div className="h-8 relative aspect-square bg-xport-gray-alternate">
+                    <Image
+                      src={chosenTeam?.icon}
+                      alt={`${chosenTeam?.name} logo`}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <span>{chosenTeam?.name}</span>
                 </div>
                 <div>
                   ODDS: <span className="text-xport-orange-light">{odds}</span>
