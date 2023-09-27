@@ -105,3 +105,26 @@ export interface MatchResponseI {
 export interface NewsResponseI {
   data: NewsObjectI[];
 }
+
+export interface ThreadObjectI {
+  id: number;
+  title: string;
+  game_id: number;
+  game_names: string;
+  game_icons: string;
+  description: string;
+  image_thread: string;
+  date: string;
+}
+
+export interface ThreadResponseI {
+  data: ThreadObjectI[];
+}
+
+export interface ThreadPayloadI {
+  title: string;
+  game_id: number;
+  description: string;
+  date: string;
+  image_thread: string;
+}

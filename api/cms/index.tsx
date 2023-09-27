@@ -9,6 +9,8 @@ import {
   NewsResponseI,
   TeamsPayloadI,
   TeamsResponseI,
+  ThreadPayloadI,
+  ThreadResponseI,
 } from '@/utils/interface';
 import { cmsApi } from '..';
 
@@ -52,6 +54,29 @@ async function updateNews(
   id: number
 ): Promise<{ data: number }> {
   const { data } = await cmsApi.patch<{ data: number }>(`/news/${id}`, payload);
+  return data;
+}
+
+async function getThreads(): Promise<ThreadResponseI> {
+  const { data } = await cmsApi.get<ThreadResponseI>('/threads');
+  return data;
+}
+
+async function createThread(
+  payload: ThreadPayloadI
+): Promise<{ data: number }> {
+  const { data } = await cmsApi.post<{ data: number }>('/threads', payload);
+  return data;
+}
+
+async function updateThread(
+  payload: ThreadPayloadI,
+  id: number
+): Promise<{ data: number }> {
+  const { data } = await cmsApi.patch<{ data: number }>(
+    `/threads/${id}`,
+    payload
+  );
   return data;
 }
 
@@ -124,6 +149,9 @@ const CmsAPI = {
   updateGames,
   getCompletedMatches,
   deleteMatch,
+  getThreads,
+  updateThread,
+  createThread,
 };
 
 export default CmsAPI;

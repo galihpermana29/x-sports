@@ -13,6 +13,7 @@ import {
   DatePicker,
   Row,
   TimePicker,
+  FormInstance,
 } from 'antd';
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
@@ -27,12 +28,20 @@ import { contractAddress } from '@/utils/web3/address';
 export default function Ongoing() {
   const [form] = Form.useForm();
   const { ethersProvider } = useAuth();
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState<{
+    open: boolean;
+    type: 'create' | 'end';
+  }>({ open: false, type: 'create' });
+
   const [datas, setDatas] = useState<MatchObjectI[]>();
   const [loading, setLoading] = useState<boolean>(false);
   const [selectData, setSelectData] = useState<{
     game: { label: string; value: number }[];
     team: { label: string; value: number }[];
+  }>();
+  const [teamWinnerOption, setTeamWinnerOption] = useState<{
+    team: { label: string; value: number }[];
+    matchId: number;
   }>();
 
   const handleOk = () => {
@@ -60,7 +69,7 @@ export default function Ongoing() {
           );
 
           const transaction = await contracts.createMatch(
-            BigInt(matchId),
+            matchId,
             team_a_id.toString(),
             team_b_id.toString(),
             team_a_odds,
@@ -75,7 +84,7 @@ export default function Ongoing() {
         }
 
         getAllMatch();
-        setIsModalOpen(false);
+        setIsModalOpen({ open: false, type: 'create' });
         form.resetFields();
       } catch (error) {
         const axiosError = error as AxiosError; // Cast error to AxiosError
@@ -93,7 +102,7 @@ export default function Ongoing() {
   const handleDeleteMatch = async (id: number) => {
     try {
       await CmsAPI.deleteMatch(id);
-      message.success('Match updated');
+      message.success('Match deleted');
       getAllMatch();
     } catch (error) {
       const axiosError = error as AxiosError; // Cast error to AxiosError
@@ -111,7 +120,7 @@ export default function Ongoing() {
   const updateStatus = async (id: number, status: string) => {
     try {
       await CmsAPI.updateMatch({ status }, id);
-      message.success('Match deleted');
+      message.success('Match updated');
       getAllMatch();
     } catch (error) {
       const axiosError = error as AxiosError; // Cast error to AxiosError
@@ -124,6 +133,49 @@ export default function Ongoing() {
       console.log(error, responseData, 'error');
       message.error(err);
     }
+  };
+
+  const handleEnd = async () => {
+    form.validateFields().then(async () => {
+      const value = form.getFieldsValue();
+      console.log(value, 'value');
+      try {
+        try {
+          const signer = await ethersProvider.getSigner();
+          const contracts = new ethers.Contract(
+            contractAddress,
+            contractAbi,
+            signer
+          );
+          let valueOfTeam = 0;
+          if (value === teamWinnerOption.team[0].value) valueOfTeam = 0;
+          else valueOfTeam = 1;
+          const transaction = await contracts.endMatch(
+            teamWinnerOption.matchId,
+            valueOfTeam
+          );
+
+          console.log(value, teamWinnerOption, valueOfTeam);
+          updateStatus(teamWinnerOption.matchId, 'completed');
+
+          await transaction.wait();
+          message.success(`Transaction successful: ${transaction.hash}`);
+        } catch (error) {
+          console.log(error, 'err');
+          updateStatus(teamWinnerOption.matchId, 'ongoing');
+        }
+      } catch (error) {
+        const axiosError = error as AxiosError; // Cast error to AxiosError
+        const responseData = axiosError.response?.data as
+          | { errors: string[] }
+          | undefined;
+        const err = responseData
+          ? responseData?.errors[0]
+          : 'Ouch, an error happen!';
+        console.log(error, responseData, 'error');
+        message.error(err);
+      }
+    });
   };
 
   const columns = [
@@ -193,7 +245,17 @@ export default function Ongoing() {
       key: 'action',
       render: (data: MatchObjectI) => (
         <Row justify={'center'} style={{ display: 'flex', gap: '10px' }}>
-          <Button type="primary" style={{ background: 'red' }}>
+          <Button
+            onClick={() => {
+              const selection = [
+                { label: data.team_a_names, value: data.team_a_id },
+                { label: data.team_b_names, value: data.team_b_id },
+              ];
+              setIsModalOpen({ open: true, type: 'end' });
+              setTeamWinnerOption({ team: selection, matchId: data.id });
+            }}
+            type="primary"
+            style={{ background: 'red' }}>
             End
           </Button>
           {data.status === 'upcoming' && (
@@ -252,82 +314,15 @@ export default function Ongoing() {
         okButtonProps={{
           className: 'bg-black text-white',
         }}
-        open={isModalOpen}
-        onOk={handleOk}
-        onCancel={() => setIsModalOpen(false)}>
-        <Form layout="vertical" className="my-[20px]" form={form}>
-          <Form.Item
-            rules={[
-              { required: true, message: 'tournament_names is required' },
-            ]}
-            label="Tournament Name"
-            name={'tournament_names'}
-            className="mb-[10px]">
-            <Input placeholder="Tournament Name" />
-          </Form.Item>
-          <Form.Item
-            className="mb-[10px]"
-            rules={[{ required: true, message: 'game name is required' }]}
-            label="Game"
-            name={'game_id'}>
-            <Select style={{ width: '100%' }} options={selectData?.game} />
-          </Form.Item>
-          <Form.Item
-            className="mb-[10px]"
-            rules={[{ required: true, message: 'game name is required' }]}
-            label="Team A"
-            name={'team_a_id'}>
-            <Select style={{ width: '100%' }} options={selectData?.team} />
-          </Form.Item>
-          <Form.Item
-            className="mb-[10px]"
-            rules={[{ required: true, message: 'game name is required' }]}
-            label="Team B"
-            name={'team_b_id'}>
-            <Select style={{ width: '100%' }} options={selectData?.team} />
-          </Form.Item>
-          <Form.Item
-            rules={[{ required: true, message: 'team_a_odds is required' }]}
-            label="Team A Odds"
-            name={'team_a_odds'}
-            className="mb-[10px]">
-            <InputNumber placeholder="Odds A " className="w-full" />
-          </Form.Item>
-          <Form.Item
-            rules={[{ required: true, message: 'team_a_odds is required' }]}
-            label="Team B Odds"
-            name={'team_b_odds'}
-            className="mb-[10px]">
-            <InputNumber placeholder="Odds B" className="w-full" />
-          </Form.Item>
-          <Form.Item
-            rules={[{ required: true, message: 'team_a_odds is required' }]}
-            label="Date"
-            name={'date'}
-            className="mb-[10px]">
-            <DatePicker placeholder="Date match" className="w-full" />
-          </Form.Item>
-          <Form.Item
-            rules={[{ required: true, message: 'team_a_odds is required' }]}
-            label="Time"
-            name={'time'}
-            className="mb-[10px]">
-            <TimePicker
-              placeholder="Time match"
-              format="HH:mm:ss"
-              className="w-full"
-            />
-          </Form.Item>
-          <Form.Item
-            rules={[
-              { required: true, message: 'tournament_names is required' },
-            ]}
-            label="Link"
-            name={'match_link'}
-            className="mb-[10px]">
-            <Input placeholder="Match Link" />
-          </Form.Item>
-        </Form>
+        open={isModalOpen.open}
+        onOk={isModalOpen.type === 'create' ? handleOk : handleEnd}
+        onCancel={() => setIsModalOpen({ open: false, type: 'create' })}>
+        {isModalOpen.type === 'create' && (
+          <CreateFormModal form={form} selectData={selectData} />
+        )}
+        {isModalOpen.type === 'end' && (
+          <SelectWinner form={form} selectData={teamWinnerOption} />
+        )}
       </Modal>
       <div className="flex justify-between mb-[50px]">
         <div>
@@ -339,7 +334,7 @@ export default function Ongoing() {
           <Button
             size="large"
             className="bg-black text-white"
-            onClick={() => setIsModalOpen(true)}>
+            onClick={() => setIsModalOpen({ open: true, type: 'create' })}>
             Create New
           </Button>
         </div>
@@ -350,3 +345,109 @@ export default function Ongoing() {
     </div>
   );
 }
+
+const SelectWinner = ({
+  form,
+  selectData,
+}: {
+  form: FormInstance<any>;
+  selectData: {
+    team: { label: string; value: number }[];
+    matchId: number;
+  };
+}) => {
+  return (
+    <Form layout="vertical" className="my-[20px]" form={form}>
+      <Form.Item
+        className="mb-[10px]"
+        rules={[{ required: true, message: 'team name is required' }]}
+        label="Select Winner"
+        name={'winner'}>
+        <Select style={{ width: '100%' }} options={selectData?.team} />
+      </Form.Item>
+    </Form>
+  );
+};
+
+const CreateFormModal = ({
+  form,
+  selectData,
+}: {
+  form: FormInstance<any>;
+  selectData: {
+    game: { label: string; value: number }[];
+    team: { label: string; value: number }[];
+  };
+}) => {
+  return (
+    <Form layout="vertical" className="my-[20px]" form={form}>
+      <Form.Item
+        rules={[{ required: true, message: 'tournament_names is required' }]}
+        label="Tournament Name"
+        name={'tournament_names'}
+        className="mb-[10px]">
+        <Input placeholder="Tournament Name" />
+      </Form.Item>
+      <Form.Item
+        className="mb-[10px]"
+        rules={[{ required: true, message: 'game name is required' }]}
+        label="Game"
+        name={'game_id'}>
+        <Select style={{ width: '100%' }} options={selectData?.game} />
+      </Form.Item>
+      <Form.Item
+        className="mb-[10px]"
+        rules={[{ required: true, message: 'game name is required' }]}
+        label="Team A"
+        name={'team_a_id'}>
+        <Select style={{ width: '100%' }} options={selectData?.team} />
+      </Form.Item>
+      <Form.Item
+        className="mb-[10px]"
+        rules={[{ required: true, message: 'game name is required' }]}
+        label="Team B"
+        name={'team_b_id'}>
+        <Select style={{ width: '100%' }} options={selectData?.team} />
+      </Form.Item>
+      <Form.Item
+        rules={[{ required: true, message: 'team_a_odds is required' }]}
+        label="Team A Odds"
+        name={'team_a_odds'}
+        className="mb-[10px]">
+        <InputNumber placeholder="Odds A " className="w-full" />
+      </Form.Item>
+      <Form.Item
+        rules={[{ required: true, message: 'team_a_odds is required' }]}
+        label="Team B Odds"
+        name={'team_b_odds'}
+        className="mb-[10px]">
+        <InputNumber placeholder="Odds B" className="w-full" />
+      </Form.Item>
+      <Form.Item
+        rules={[{ required: true, message: 'team_a_odds is required' }]}
+        label="Date"
+        name={'date'}
+        className="mb-[10px]">
+        <DatePicker placeholder="Date match" className="w-full" />
+      </Form.Item>
+      <Form.Item
+        rules={[{ required: true, message: 'team_a_odds is required' }]}
+        label="Time"
+        name={'time'}
+        className="mb-[10px]">
+        <TimePicker
+          placeholder="Time match"
+          format="HH:mm:ss"
+          className="w-full"
+        />
+      </Form.Item>
+      <Form.Item
+        rules={[{ required: true, message: 'tournament_names is required' }]}
+        label="Link"
+        name={'match_link'}
+        className="mb-[10px]">
+        <Input placeholder="Match Link" />
+      </Form.Item>
+    </Form>
+  );
+};

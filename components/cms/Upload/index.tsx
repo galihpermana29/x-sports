@@ -57,8 +57,10 @@ const ImageUpload = ({ form, name }: ImageUploadI) => {
 
   useEffect(() => {
     const initial = form.getFieldValue(name) ?? null;
+
+    console.log(initial, 'init image');
     setImageUrl(initial);
-  }, []);
+  }, [name, form]);
 
   return (
     <div className="flex flex-col items-start">
