@@ -97,7 +97,7 @@ export default function Games() {
   return (
     <div className="p-[50px]">
       <Modal
-        title="Add New Team"
+        title="Add New Games"
         okText={'Add'}
         okButtonProps={{
           className: 'bg-black text-white',
