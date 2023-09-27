@@ -1,14 +1,17 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
 import GET from '@/api/get';
+import PATCH from '@/api/patch';
 import ArrowDownIcon from '@/components/icons/ArrowDownIcon';
 import GameIcon from '@/components/icons/GameIcon';
 import HomeIcon from '@/components/icons/HomeIcon';
 import NewsIcon from '@/components/icons/NewsIcon';
 import ThreadsIcon from '@/components/icons/ThreadsIcon';
 import WalletIcon from '@/components/icons/WalletIcon';
-import type { GamesData } from '@/utils/types';
+import type { Game } from '@/utils/types';
 import { Menu, Transition } from '@headlessui/react';
+import dayjs from 'dayjs';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -17,16 +20,33 @@ import LogoWithText from '../LogoWithText';
 import MobileMenuButton from '../MobileMenuButton';
 
 function Navbar() {
-  const [games, setGames] = useState<GamesData>();
+  const [games, setGames] = useState<Game[]>();
 
   const path = usePathname();
 
-  useEffect(() => {
-    const getAllGames = async () => {
-      const res = await GET.getAllGames();
-      setGames(res);
-    };
+  const currentDateTime = dayjs().format('YYYY-MM-DD HH:mm:ss Z');
 
+  const getAllGames = async () => {
+    const { data } = await GET.getAllGames();
+    setGames(data);
+  };
+
+  const updateMatchStatus = async () => {
+    const { data } = await GET.getMatchByStatus('upcoming');
+
+    data.forEach(async ({ date, id }) => {
+      if (date >= currentDateTime) {
+        try {
+          await PATCH.updateMatchStatus({ status: 'ongoing' }, id);
+        } catch (error) {
+          alert(error);
+        }
+      }
+    });
+  };
+
+  useEffect(() => {
+    updateMatchStatus();
     getAllGames();
   }, []);
 
@@ -102,7 +122,7 @@ function Navbar() {
                         <p className="font-medium">List of Games</p>
                       </div>
                       <div className="flex flex-wrap w-96 divide-xport-gray-primary">
-                        {games?.data?.map(({ game_names, id, game_icons }) => {
+                        {games?.map(({ game_names, id, game_icons }) => {
                           return (
                             <Menu.Item key={id}>
                               {() => (
