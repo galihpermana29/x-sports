@@ -22,6 +22,7 @@ function Livestream() {
   const [currentOdds, setCurrentOdds] = useState<number | null>(null);
   const [currentTeam, setCurrentTeam] = useState<string | null>(null);
   const [currentTeamIcon, setcurrentTeamIcon] = useState<string | null>(null);
+  const toWei = (num: number) => ethers.utils.parseEther(num.toString());
 
   const path = usePathname();
   const matchId = parseInt(path.split('/').pop());
@@ -44,9 +45,11 @@ function Livestream() {
 
   const handleClickBet = async (payout: number) => {
     if (currentTeam === null) return;
-    let valueOfTeam = 0;
-    if (currentTeam === match.team_a_names) valueOfTeam = 0;
-    else valueOfTeam = 1;
+    let valueOfTeam = 1;
+    if (currentTeam === match.team_a_names) valueOfTeam = 1;
+    else valueOfTeam = 2;
+    
+    console.log(payout*1000)
 
     try {
       const signer = await ethersProvider.getSigner();
@@ -56,15 +59,21 @@ function Livestream() {
         signer
       );
 
+      const gasEstimate = await contracts.estimateGas.placeBet(BigInt(matchId), valueOfTeam, {
+        value: toWei(payout * 1000),
+      });
+
+      const gasLimit = gasEstimate.mul(2)
+
       const transaction = await contracts.placeBet(
         BigInt(matchId),
-        payout * 1000,
         valueOfTeam,
         {
-          gasLimit: 30000,
-          // gasPrice: 25,
+          value: toWei(payout * 1000),
+          gasLimit: gasLimit,
         }
       );
+
 
       await transaction.wait();
       message.success(`Transaction successful: ${transaction.hash}`);

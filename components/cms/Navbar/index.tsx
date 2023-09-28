@@ -47,6 +47,11 @@ export default function Sidebar() {
       link: '/cms/home/teams',
       image: team,
     },
+    {
+      name: 'Deposit',
+      link: '/cms/home/deposit',
+      image: team,
+    },
   ];
   return (
     <div className="min-h-screen bg-[#2A313B] max-w-max p-[30px] flex flex-col justify-between">

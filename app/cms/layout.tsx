@@ -16,6 +16,7 @@ export default function CMSLayout({ children }: { children: React.ReactNode }) {
     '/cms/home/news',
     '/cms/home/completed',
     '/cms/home/threads',
+    '/cms/home/deposit',
   ];
 
   useEffect(() => {

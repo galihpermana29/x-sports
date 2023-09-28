@@ -33,6 +33,7 @@ export default function Ongoing() {
     type: 'create' | 'end';
   }>({ open: false, type: 'create' });
 
+  const toWei = (num: number) => ethers.utils.parseEther(num.toString());
   const [datas, setDatas] = useState<MatchObjectI[]>();
   const [loading, setLoading] = useState<boolean>(false);
   const [selectData, setSelectData] = useState<{
@@ -72,6 +73,7 @@ export default function Ongoing() {
             matchId,
             team_a_id.toString(),
             team_b_id.toString(),
+            toWei(100000000000),
             team_a_odds,
             team_b_odds
           );
@@ -147,9 +149,9 @@ export default function Ongoing() {
             contractAbi,
             signer
           );
-          let valueOfTeam = 0;
-          if (value === teamWinnerOption.team[0].value) valueOfTeam = 0;
-          else valueOfTeam = 1;
+          let valueOfTeam = 1;
+          if (value === teamWinnerOption.team[0].value) valueOfTeam = 1;
+          else valueOfTeam = 2;
           const transaction = await contracts.endMatch(
             teamWinnerOption.matchId,
             valueOfTeam
