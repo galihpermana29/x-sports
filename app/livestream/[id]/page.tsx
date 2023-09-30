@@ -48,8 +48,8 @@ function Livestream() {
     let valueOfTeam = 1;
     if (currentTeam === match.team_a_names) valueOfTeam = 1;
     else valueOfTeam = 2;
-    
-    console.log(payout*1000)
+
+    console.log(payout * 1000);
 
     try {
       const signer = await ethersProvider.getSigner();
@@ -59,11 +59,15 @@ function Livestream() {
         signer
       );
 
-      const gasEstimate = await contracts.estimateGas.placeBet(BigInt(matchId), valueOfTeam, {
-        value: toWei(payout * 1000),
-      });
+      const gasEstimate = await contracts.estimateGas.placeBet(
+        BigInt(matchId),
+        valueOfTeam,
+        {
+          value: toWei(payout * 1000),
+        }
+      );
 
-      const gasLimit = gasEstimate.mul(2)
+      const gasLimit = gasEstimate.mul(2);
 
       const transaction = await contracts.placeBet(
         BigInt(matchId),
@@ -73,7 +77,6 @@ function Livestream() {
           gasLimit: gasLimit,
         }
       );
-
 
       await transaction.wait();
       message.success(`Transaction successful: ${transaction.hash}`);

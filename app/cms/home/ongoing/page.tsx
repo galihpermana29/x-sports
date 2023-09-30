@@ -210,6 +210,9 @@ export default function Ongoing() {
       title: ' A Odds',
       dataIndex: 'team_a_odds',
       key: 'team_a_odds',
+      render: (team_a_odds: number) => (
+        <div className="max-w-[150px]">{team_a_odds / 100}</div>
+      ),
     },
     {
       title: 'Team B',
@@ -221,6 +224,9 @@ export default function Ongoing() {
       title: 'B Odds',
       dataIndex: 'team_b_odds',
       key: 'team_b_odds',
+      render: (team_b_odds: number) => (
+        <div className="max-w-[150px]">{team_b_odds / 100}</div>
+      ),
     },
     {
       title: 'Date',
