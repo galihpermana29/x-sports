@@ -78,7 +78,7 @@ export default async function Home() {
                         </h3>
                       </div>
                       <p className="font-bold text-xport-orange-light">
-                        {spotlight.team_a_odds}
+                        {spotlight.team_a_odds/100}
                       </p>
                     </div>
                     <div className="basis-[15%] flex justify-center items-center italic">
@@ -86,7 +86,7 @@ export default async function Home() {
                     </div>
                     <div className="bg-xport-gray-alternate w-full px-5 py-3 rounded-l-full flex gap-1 justify-between items-center">
                       <p className="font-bold text-xport-orange-light">
-                        {spotlight.team_b_odds}
+                        {spotlight.team_b_odds/100}
                       </p>
                       <div className="flex items-center gap-3">
                         <h3 className="font-medium text-end">
