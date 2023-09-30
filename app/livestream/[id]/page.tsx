@@ -48,8 +48,8 @@ function Livestream() {
     let valueOfTeam = 1;
     if (currentTeam === match.team_a_names) valueOfTeam = 1;
     else valueOfTeam = 2;
-    
-    console.log(payout*1000)
+
+    console.log(payout * 1000);
 
     try {
       const signer = await ethersProvider.getSigner();
@@ -59,11 +59,15 @@ function Livestream() {
         signer
       );
 
-      const gasEstimate = await contracts.estimateGas.placeBet(BigInt(matchId), valueOfTeam, {
-        value: toWei(payout * 1000),
-      });
+      const gasEstimate = await contracts.estimateGas.placeBet(
+        BigInt(matchId),
+        valueOfTeam,
+        {
+          value: toWei(payout * 1000),
+        }
+      );
 
-      const gasLimit = gasEstimate.mul(2)
+      const gasLimit = gasEstimate.mul(2);
 
       const transaction = await contracts.placeBet(
         BigInt(matchId),
@@ -73,7 +77,6 @@ function Livestream() {
           gasLimit: gasLimit,
         }
       );
-
 
       await transaction.wait();
       message.success(`Transaction successful: ${transaction.hash}`);
@@ -132,7 +135,7 @@ function Livestream() {
                 <h3 className="font-medium">{match?.team_a_names}</h3>
               </div>
               <p className="font-bold text-xport-orange-light">
-                {match?.team_a_odds}
+                {match?.team_a_odds / 100}
               </p>
             </div>
             <button
@@ -160,7 +163,7 @@ function Livestream() {
             </button>
             <div className="bg-xport-gray-alternate basis-[70%] px-5 py-3 rounded-l-full flex justify-between items-center">
               <p className="font-bold text-xport-orange-light">
-                {match?.team_b_odds}
+                {match?.team_b_odds / 100}
               </p>
               <div className="flex items-center gap-3">
                 <h3 className="font-medium text-end">{match?.team_b_names}</h3>
