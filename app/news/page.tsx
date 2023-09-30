@@ -16,12 +16,12 @@ import { useEffect, useState } from 'react';
 function NewsPage() {
   const param = useSearchParams();
   const parsedParam = parseInt(param.get('game_id'));
-  const paramId = isNaN(parsedParam) ? 1 : parsedParam;
+  const paramId = isNaN(parsedParam) ? 7 : parsedParam;
 
   const [news, setNews] = useState<News[]>();
   const [gameList, setGameList] = useState<Game[]>([]);
   const [currentId, setCurrentId] = useState<number>(paramId);
-
+  console.log(currentId)
   const currentGame = gameList?.find((el) => el.id === currentId);
 
   let firstHeadline, secondHeadline, thirdHeadline: News;

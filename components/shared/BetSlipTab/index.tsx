@@ -70,7 +70,7 @@ function BetSlipTab({
                   <span>{chosenTeam?.name}</span>
                 </div>
                 <div>
-                  ODDS: <span className="text-xport-orange-light">{odds}</span>
+                  ODDS: <span className="text-xport-orange-light">{odds/100}</span>
                 </div>
               </div>
             )}
@@ -130,7 +130,7 @@ function BetSlipTab({
             </div>
             <div className="basis-1/2 py-2 font-semibold flex items-center justify-between px-2 ">
               <span>PAYOUT</span>
-              <span>{selectedPayout * odds}K</span>
+              <span>{selectedPayout * odds/100}K</span>
             </div>
           </div>
         </div>
@@ -143,7 +143,7 @@ function BetSlipTab({
           </div>
           <div className="flex justify-between">
             <span>Payout</span>
-            <span>{selectedPayout * odds}K BTTC</span>
+            <span>{selectedPayout * odds/100}K BTTC</span>
           </div>
         </div>
         <button

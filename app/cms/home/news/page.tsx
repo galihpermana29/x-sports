@@ -73,7 +73,7 @@ export default function News() {
       dataIndex: 'description',
       key: 'description',
       render: (description: string) => (
-        <div className="max-w-[300px]">{description}</div>
+        <div className="max-w-[300px]">{description.length > 50  ? description.slice(0, 50) + ".." : description}</div>
       ),
     },
     {
