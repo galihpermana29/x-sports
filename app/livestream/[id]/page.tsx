@@ -132,7 +132,7 @@ function Livestream() {
                 <h3 className="font-medium">{match?.team_a_names}</h3>
               </div>
               <p className="font-bold text-xport-orange-light">
-                {match?.team_a_odds}
+                {match?.team_a_odds / 100}
               </p>
             </div>
             <button
@@ -160,7 +160,7 @@ function Livestream() {
             </button>
             <div className="bg-xport-gray-alternate basis-[70%] px-5 py-3 rounded-l-full flex justify-between items-center">
               <p className="font-bold text-xport-orange-light">
-                {match?.team_b_odds}
+                {match?.team_b_odds / 100}
               </p>
               <div className="flex items-center gap-3">
                 <h3 className="font-medium text-end">{match?.team_b_names}</h3>

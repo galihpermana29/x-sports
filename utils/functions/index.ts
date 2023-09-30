@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 export const parseVideoId = (url: string) => {
   const regex = /(?:\/|v=)([A-Za-z0-9_-]{11})/;
 
@@ -17,4 +19,9 @@ export const shuffleArray = <T>(array: T[]): T[] => {
     [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
   }
   return newArray;
+};
+
+export const formatDate = (dateString: string): string => {
+  const formattedDate = dayjs(dateString).format('MMM DD HH:mm [GMT]Z');
+  return formattedDate;
 };
