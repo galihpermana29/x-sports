@@ -46,13 +46,17 @@ function MatchCard(props: MatchDetail) {
             </div>
             <h3 className="font-medium">{team_a_names}</h3>
           </div>
-          <p className="font-bold text-xport-orange-light">{team_a_odds}</p>
+          <p className="font-bold text-xport-orange-light">
+            {team_a_odds / 100}
+          </p>
         </div>
         <div className="basis-[15%] flex justify-center items-center italic">
           vs
         </div>
         <div className="bg-xport-gray-alternate w-full px-5 py-3 rounded-l-full flex gap-1 justify-between items-center">
-          <p className="font-bold text-xport-orange-light">{team_b_odds}</p>
+          <p className="font-bold text-xport-orange-light">
+            {team_b_odds / 100}
+          </p>
           <div className="flex items-center gap-3">
             <h3 className="font-medium text-end">{team_b_names}</h3>
             <div className="relative h-10 w-10 bg-xport-black-light rounded-full">
