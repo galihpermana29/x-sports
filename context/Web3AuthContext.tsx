@@ -15,8 +15,12 @@ let ethersProvider: any;
 
 if (typeof window !== 'undefined') {
   ethereum = (window as any).ethereum;
-  web3 = new Web3(ethereum);
-  ethersProvider = new ethers.providers.Web3Provider(ethereum);
+  if (ethereum) {
+    web3 = new Web3(ethereum);
+    ethersProvider = new ethers.providers.Web3Provider(ethereum);
+  } else {
+    window.location.href = 'https://metamask.io/download.html';
+  }
 }
 
 interface AuthContextType {
