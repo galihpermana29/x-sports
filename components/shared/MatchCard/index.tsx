@@ -1,5 +1,6 @@
 import ArrowDownIcon from '@/components/icons/ArrowDownIcon';
 import { MatchDetail } from '@/utils/types';
+import dayjs from 'dayjs';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -91,7 +92,7 @@ function MatchCard(props: MatchDetail) {
       {status === 'upcoming' && (
         <div className="md:basis-[20%] bg-xport-gray-alternate md:bg-transparent md:py-0 group flex justify-center items-center font-medium">
           <div className="grow flex justify-center items-center px-1">
-            <span>{date}</span>
+            <span>{dayjs(date).format('MMM DD HH:mm [GMT]Z')}</span>
           </div>
           <div className="flex items-center py-3 md:py-0 bg-xport-gray-primary h-full">
             <ArrowDownIcon className="h-5 w-5 fill-slate-50 -rotate-90" />
