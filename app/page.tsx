@@ -10,11 +10,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 export default async function Home() {
-  const { data: spotlightList } = await GET.getMatchByStatus('upcoming');
-  const { data: news } = await GET.getNewsByGameId(1);
+  const { data: spotlightList } = await GET.getMatchByStatus('ongoing');
+  const { data: news } = await GET.getNewsByGameId(6);
   const { data: threads } = await GET.getAllThreads();
   const { data: ongoingLivestreams } = await GET.getMatchByMultipleFilters([
-    'game_id=1',
+    'game_id=6',
     'status=ongoing',
   ]);
 
@@ -114,7 +114,7 @@ export default async function Home() {
       <section>
         <Link href={'/game?game_id=1'}>
           <h2 className="font-semibold group w-fit text-xl mb-5 flex items-center gap-1">
-            <span className="text-xport-orange-primary">Mobile Legends</span>{' '}
+            <span className="text-xport-orange-primary">Valorant</span>{' '}
             Ongoing Livestream{' '}
             <ArrowRightIcon className="w-5 group-hover:translate-x-1 transition-all duration-150" />
           </h2>
