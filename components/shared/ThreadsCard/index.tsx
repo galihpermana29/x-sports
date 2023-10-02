@@ -16,7 +16,7 @@ function ThreadsCard({ date, game_names, image_thread, title, id }: Threads) {
           </div>
         </div>
       </div>
-      <h3>{title}</h3>
+      <h3 className="line-clamp-2">{title}</h3>
       <div className="relative w-full aspect-video rounded overflow-hidden">
         <Image src={image_thread} alt={title} fill sizes="100vh" />
       </div>
