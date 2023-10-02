@@ -119,9 +119,15 @@ export default function Ongoing() {
     }
   };
 
-  const updateStatus = async (id: number, status: string) => {
+  const updateStatus = async (id: number, status: string, winner?: number) => {
     try {
-      await CmsAPI.updateMatch({ status }, id);
+      let payload = {};
+      if (status === 'completed') {
+        payload = { status, winner };
+      } else {
+        payload = { status };
+      }
+      await CmsAPI.updateMatch(payload, id);
       message.success('Match updated');
       getAllMatch();
     } catch (error) {
@@ -131,11 +137,11 @@ export default function Ongoing() {
         | undefined;
       const err = responseData
         ? responseData?.errors[0]
-        : 'Ouch, an error happen!';
+        : 'Ouch, an error happened!';
       console.log(error, responseData, 'error');
       message.error(err);
     }
-  };
+  };  
 
   const handleEnd = async () => {
     form.validateFields().then(async () => {
@@ -149,16 +155,16 @@ export default function Ongoing() {
             contractAbi,
             signer
           );
-          let valueOfTeam = 1;
-          if (value === teamWinnerOption.team[0].value) valueOfTeam = 1;
-          else valueOfTeam = 2;
+          let valueOfTeam = 0;
+          if (value === teamWinnerOption.team[0].value) valueOfTeam = 0;
+          else valueOfTeam = 1;
           const transaction = await contracts.endMatch(
             teamWinnerOption.matchId,
             valueOfTeam
           );
 
           console.log(value, teamWinnerOption, valueOfTeam);
-          updateStatus(teamWinnerOption.matchId, 'completed');
+          updateStatus(teamWinnerOption.matchId, 'completed', valueOfTeam);
 
           await transaction.wait();
           message.success(`Transaction successful: ${transaction.hash}`);
