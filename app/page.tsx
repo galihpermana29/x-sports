@@ -6,15 +6,20 @@ import RectangleSkeleton from '@/components/shared/RectangleSkeleton';
 import ThreadsCard from '@/components/shared/ThreadsCard';
 import { parseVideoId } from '@/utils/functions';
 import { News } from '@/utils/types';
+import dayjs from 'dayjs';
 import Image from 'next/image';
 import Link from 'next/link';
 
 export default async function Home() {
+  const { data: games } = await GET.getAllGames();
+  const initialId = games[0]?.id;
+  const initialGameName = games[0]?.game_names;
+
   const { data: spotlightList } = await GET.getMatchByStatus('ongoing');
-  const { data: news } = await GET.getNewsByGameId(6);
+  const { data: news } = await GET.getNewsByGameId(initialId);
   const { data: threads } = await GET.getAllThreads();
   const { data: ongoingLivestreams } = await GET.getMatchByMultipleFilters([
-    'game_id=6',
+    `game_id=${initialId}`,
     'status=ongoing',
   ]);
 
@@ -53,7 +58,10 @@ export default async function Home() {
                   {spotlight.team_a_names} vs {spotlight.team_b_names}
                 </h3>
                 <p>Game on stream - {spotlight.game_names}</p>
-                <p>Stream begins - {spotlight.date}</p>
+                <p>
+                  Stream begins -{' '}
+                  {dayjs(spotlight.date).format('MMM D YYYY HH:mm')}
+                </p>
               </div>
               <div className="flex flex-col w-full">
                 <div className="font-bold">
@@ -64,13 +72,12 @@ export default async function Home() {
                   <div className="bg-xport-black-light w-full flex flex-col xs:flex-row gap-2 text-xs md:text-base">
                     <div className="bg-xport-gray-alternate w-full px-5 py-3 rounded-r-full flex gap-1 justify-between items-center">
                       <div className="flex items-center gap-3">
-                        <div className="relative h-10 w-10 bg-xport-black-light rounded-full">
+                        <div className="relative h-10 w-10">
                           <Image
                             src={spotlight.team_a_icons}
                             alt={`${spotlight.team_a_names} logo`}
                             fill
                             sizes="100vh"
-                            className="object-cover"
                           />
                         </div>
                         <h3 className="font-medium">
@@ -78,7 +85,7 @@ export default async function Home() {
                         </h3>
                       </div>
                       <p className="font-bold text-xport-orange-light">
-                        {spotlight.team_a_odds/100}
+                        {spotlight.team_a_odds / 100}
                       </p>
                     </div>
                     <div className="basis-[15%] flex justify-center items-center italic">
@@ -86,19 +93,18 @@ export default async function Home() {
                     </div>
                     <div className="bg-xport-gray-alternate w-full px-5 py-3 rounded-l-full flex gap-1 justify-between items-center">
                       <p className="font-bold text-xport-orange-light">
-                        {spotlight.team_b_odds/100}
+                        {spotlight.team_b_odds / 100}
                       </p>
                       <div className="flex items-center gap-3">
                         <h3 className="font-medium text-end">
                           {spotlight.team_b_names}
                         </h3>
-                        <div className="relative h-10 w-10 bg-xport-black-light rounded-full">
+                        <div className="relative h-10 w-10">
                           <Image
                             src={spotlight.team_b_icons}
                             alt={`${spotlight.team_b_names} logo`}
                             fill
                             sizes="100vh"
-                            className="object-cover"
                           />
                         </div>
                       </div>
@@ -112,9 +118,9 @@ export default async function Home() {
       )}
 
       <section>
-        <Link href={'/game?game_id=1'}>
-          <h2 className="font-semibold group w-fit text-xl mb-5 flex items-center gap-1">
-            <span className="text-xport-orange-primary">Valorant</span>{' '}
+        <Link href={`/game?game_id=${initialId}`}>
+          <h2 className="font-semibold group w-fit text-xl mb-5 flex items-center gap-2">
+            <span className="text-xport-orange-primary">{initialGameName}</span>{' '}
             Ongoing Livestream{' '}
             <ArrowRightIcon className="w-5 group-hover:translate-x-1 transition-all duration-150" />
           </h2>
@@ -256,8 +262,8 @@ export default async function Home() {
           </h2>
         </Link>
         <div className="grid grid-cols-4 gap-2">
-          {threads?.map((item) => {
-            return <ThreadsCard key={item.id} {...item} />;
+          {threads?.map((item, index) => {
+            return index < 8 && <ThreadsCard key={item.id} {...item} />;
           })}
         </div>
       </section>

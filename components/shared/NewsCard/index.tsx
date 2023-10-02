@@ -37,7 +37,7 @@ function NewsCard({
             <span className="font-medium text-sm">{game_names}</span>
           </div>
         </div>
-        <p className="line-clamp-4">{description}</p>
+        <p className="line-clamp-5 text-sm">{description}</p>
       </div>
     </Link>
   );

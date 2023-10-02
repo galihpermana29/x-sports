@@ -34,7 +34,7 @@ async function NewsDetailPage({ params }: { params: { id: string } }) {
       <aside className="basis-[40%] overflow-hidden lg:basis-[30%] w-full h-fit rounded-md bg-xport-black-light">
         <div className="flex px-5 pt-5 items-center gap-2 text-lg font-semibold">
           <FireIcon className="w-7 h-7 fill-xport-light" />
-          <h3>Hot Threads</h3>
+          <h3>Hot News</h3>
         </div>
         <div className="flex flex-col mt-5">
           {hotNews?.map(({ id, title, game_names, image_news }, index) => {

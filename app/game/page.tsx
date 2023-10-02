@@ -15,7 +15,7 @@ import { useEffect, useState } from 'react';
 function GamePage() {
   const param = useSearchParams();
   const parsedParam = parseInt(param.get('game_id'));
-  const paramId = isNaN(parsedParam) ? 1 : parsedParam;
+  const paramId = isNaN(parsedParam) ? 7 : parsedParam;
 
   const [ongoingMatches, setOngoingMatches] = useState<MatchDetail[]>();
   const [news, setNews] = useState<News[]>();

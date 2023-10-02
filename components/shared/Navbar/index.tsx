@@ -2,23 +2,21 @@
 'use client';
 
 import GET from '@/api/get';
-import PATCH from '@/api/patch';
 import ArrowDownIcon from '@/components/icons/ArrowDownIcon';
 import GameIcon from '@/components/icons/GameIcon';
 import HomeIcon from '@/components/icons/HomeIcon';
 import NewsIcon from '@/components/icons/NewsIcon';
 import ThreadsIcon from '@/components/icons/ThreadsIcon';
 import WalletIcon from '@/components/icons/WalletIcon';
+import { useAuth } from '@/context/Web3AuthContext';
 import type { Game } from '@/utils/types';
 import { Menu, Transition } from '@headlessui/react';
-import dayjs from 'dayjs';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import LogoWithText from '../LogoWithText';
 import MobileMenuButton from '../MobileMenuButton';
-import { useAuth } from '@/context/Web3AuthContext';
 
 function Navbar() {
   const [games, setGames] = useState<Game[]>();
@@ -31,29 +29,29 @@ function Navbar() {
     addBitTorrentChainToMetaMask,
   } = useAuth();
 
-  const currentDateTime = dayjs().format('YYYY-MM-DD HH:mm:ss Z');
+  // const currentDateTime = dayjs().format('YYYY-MM-DD HH:mm:ss Z');
 
   const getAllGames = async () => {
     const { data } = await GET.getAllGames();
     setGames(data);
   };
 
-  const updateMatchStatus = async () => {
-    const { data } = await GET.getMatchByStatus('upcoming');
+  // const updateMatchStatus = async () => {
+  //   const { data } = await GET.getMatchByStatus('upcoming');
 
-    data.forEach(async ({ date, id }) => {
-      if (date >= currentDateTime) {
-        try {
-          await PATCH.updateMatchStatus({ status: 'ongoing' }, id);
-        } catch (error) {
-          alert(error);
-        }
-      }
-    });
-  };
+  //   data.forEach(async ({ date, id }) => {
+  //     if (date >= currentDateTime) {
+  //       try {
+  //         await PATCH.updateMatchStatus({ status: 'ongoing' }, id);
+  //       } catch (error) {
+  //         alert(error);
+  //       }
+  //     }
+  //   });
+  // };
 
   useEffect(() => {
-    updateMatchStatus();
+    // updateMatchStatus();
     getAllGames();
   }, []);
 
@@ -140,12 +138,13 @@ function Navbar() {
                                 <Link
                                   href={`/game?game_id=${id}`}
                                   className="p-5 basis-1/4 w-full aspect-square cursor-pointer hover:bg-xport-black-light transition-all duration-150 flex flex-col gap-3 justify-start items-center">
-                                  <div className="relative w-10 h-10 bg-xport-black-light">
+                                  <div className="relative w-10 h-10">
                                     <Image
                                       src={game_icons}
                                       alt={`${game_names} logo`}
                                       fill
                                       sizes="100vh"
+                                      className="object-cover"
                                     />
                                   </div>
                                   <span className="text-xs line-clamp-1 text-center font-semibold text-white">

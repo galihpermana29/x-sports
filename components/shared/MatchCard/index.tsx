@@ -28,21 +28,23 @@ function MatchCard(props: MatchDetail) {
             alt={`${tournament_names} logo`}
             fill
             sizes="100vh"
-            className="object-cover"
           />
         </div>
-        <span className="font-semibold text-xport-game-mlbb">{tournament_names.length > 13 ? tournament_names.slice(0, 13) + ".." : tournament_names}</span>
+        <span className="font-semibold text-xport-game-mlbb">
+          {tournament_names.length > 13
+            ? tournament_names.slice(0, 13) + '..'
+            : tournament_names}
+        </span>
       </div>
       <div className="bg-xport-black-light w-full flex flex-col xs:flex-row gap-2 basis-[60%] text-xs md:text-base">
         <div className="bg-xport-gray-alternate w-full px-5 py-3 rounded-r-full flex gap-1 justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="relative h-10 w-10 bg-xport-black-light rounded-full">
+            <div className="relative h-10 w-10">
               <Image
                 src={team_a_icons}
                 alt={`${team_a_names} logo`}
                 fill
                 sizes="100vh"
-                className="object-cover"
               />
             </div>
             <h3 className="font-medium">{team_a_names}</h3>
@@ -60,13 +62,12 @@ function MatchCard(props: MatchDetail) {
           </p>
           <div className="flex items-center gap-3">
             <h3 className="font-medium text-end">{team_b_names}</h3>
-            <div className="relative h-10 w-10 bg-xport-black-light rounded-full">
+            <div className="relative h-10 w-10">
               <Image
                 src={team_b_icons}
                 alt={`${team_b_names} logo`}
                 fill
                 sizes="100vh"
-                className="object-cover"
               />
             </div>
           </div>
