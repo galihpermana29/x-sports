@@ -39,6 +39,15 @@ async function getCompletedMatches(): Promise<MatchResponseI> {
   return data;
 }
 
+async function getUpcomingMatches(): Promise<MatchResponseI> {
+  const { data } = await cmsApi.get<MatchResponseI>(`/matchs?status=upcoming`);
+  return data;
+}
+async function getOngoingMatches(): Promise<MatchResponseI> {
+  const { data } = await cmsApi.get<MatchResponseI>(`/matchs?status=ongoing`);
+  return data;
+}
+
 async function getNews(): Promise<NewsResponseI> {
   const { data } = await cmsApi.get<NewsResponseI>('/news');
   return data;
@@ -152,6 +161,8 @@ const CmsAPI = {
   getThreads,
   updateThread,
   createThread,
+  getUpcomingMatches,
+  getOngoingMatches,
 };
 
 export default CmsAPI;

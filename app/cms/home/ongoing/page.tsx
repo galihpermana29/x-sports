@@ -141,7 +141,7 @@ export default function Ongoing() {
       console.log(error, responseData, 'error');
       message.error(err);
     }
-  };  
+  };
 
   const handleEnd = async () => {
     form.validateFields().then(async () => {
@@ -164,7 +164,7 @@ export default function Ongoing() {
           );
 
           console.log(value, teamWinnerOption, valueOfTeam);
-          updateStatus(teamWinnerOption.matchId, 'completed', valueOfTeam);
+          updateStatus(teamWinnerOption.matchId, 'completed', value.winner);
 
           await transaction.wait();
           message.success(`Transaction successful: ${transaction.hash}`);
@@ -293,9 +293,11 @@ export default function Ongoing() {
   const getAllMatch = async () => {
     try {
       setLoading(true);
-      const { data } = await CmsAPI.getMatches();
+      const { data } = await CmsAPI.getUpcomingMatches();
+      const { data: dataOngoing } = await CmsAPI.getOngoingMatches();
       const { data: dataGame } = await CmsAPI.getGames();
       const { data: dataTeam } = await CmsAPI.getTeams();
+
       const newMapGame = dataGame.map((d) => ({
         label: d.game_names,
         value: d.id,
@@ -304,10 +306,11 @@ export default function Ongoing() {
         label: d.team_names,
         value: d.id,
       }));
-      const newMap = data.map((d) => ({
+      const newMap = [...data, ...dataOngoing].map((d) => ({
         ...d,
         key: d.id,
       }));
+
       setSelectData({ game: newMapGame, team: newMapTeam });
       setDatas(newMap);
     } catch (error) {
