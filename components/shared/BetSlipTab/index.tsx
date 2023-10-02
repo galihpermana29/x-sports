@@ -134,6 +134,8 @@ function BetSlipTab({
             </div>
           </div>
         </div>
+        <br></br>
+        <p>*The payout will automatically go into your wallet after the team you choose wins</p>
       </div>
       <div className="bg-xport-orange-primary text-xs flex items-center">
         <div className="bg-xport-gray-alternate w-2/3 flex flex-col gap2 pl-3 pr-4 py-5 rounded-r-full">
