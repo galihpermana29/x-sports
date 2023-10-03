@@ -31,7 +31,7 @@ export default async function Home() {
     thirdHeadline = news[2];
   }
 
-  const spotlight = spotlightList[0] ?? null;
+  const spotlight = spotlightList[3] ?? null;
 
   return (
     <main className="flex flex-col gap-10 max-w-screen-xl mx-auto px-5 py-10 md:px-10">
