@@ -217,7 +217,9 @@ function Navbar() {
             )}
           </div>
         ) : (
-          <button className="hidden lg:flex items-center gap-3 px-5 py-2 rounded-[15px] font-semibold bg-gradient-to-r from-xport-orange-light text-white via-xport-orange-primary to-xport-orange-primary hover:scale-105 transition-all duration-150 active:translate-y-1">
+          <button
+          onClick={connectWallet} 
+          className="hidden lg:flex items-center gap-3 px-5 py-2 rounded-[15px] font-semibold bg-gradient-to-r from-xport-orange-light text-white via-xport-orange-primary to-xport-orange-primary hover:scale-105 transition-all duration-150 active:translate-y-1">
             <WalletIcon className="w-6 h-6 fill-white" />
             <span>Connect wallet</span>
           </button>
